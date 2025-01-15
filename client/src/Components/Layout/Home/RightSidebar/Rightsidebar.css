@@ -1,0 +1,3 @@
+.storiescontainer::-webkit-scrollbar{
+    display: none;
+}
