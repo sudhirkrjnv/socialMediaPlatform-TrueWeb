@@ -3,7 +3,7 @@ import MainLayout from './Components/Layout/MainLayout';
 import './App.css';
 import Home from './Components/Layout/Home/Home';
 import Profile from './Components/Layout/Profile/Profile';
-import Messages from './Components/Layout/Messages/Messages';
+import ChatPage from './Components/Layout/ChatPage/ChatPage';
 
 function App() {
   const browserRouter = createBrowserRouter([
@@ -20,8 +20,8 @@ function App() {
           element:<Profile/>
         },
         {
-          path:"/message/",
-          element:<Messages/>
+          path:"/ChatPage/",
+          element:<ChatPage/>
         }
       ]
     }

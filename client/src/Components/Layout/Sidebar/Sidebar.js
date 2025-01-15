@@ -22,6 +22,8 @@ function Sidebar(){
             navigate("/");
         }else if(textType === 'Profile') {
             navigate("/Profile");
+        }else if(textType === 'Messages') {
+            navigate("/ChatPage");
         };
     }
 
