@@ -1,0 +1,26 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+.formcontainer{
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+form{
+    display: flex;
+    margin: auto;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(219, 214, 214);
+    color: black;
+    border-radius: 0.5em;
+    height: 28vh;
+    width: 15vw;
+}
+.inputbox{
+    height: 2.5vh;
+    width: 11vw;
+}

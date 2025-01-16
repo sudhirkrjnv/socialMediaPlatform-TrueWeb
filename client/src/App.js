@@ -4,6 +4,8 @@ import './App.css';
 import Home from './Components/Layout/Home/Home';
 import Profile from './Components/Layout/Profile/Profile';
 import ChatPage from './Components/Layout/ChatPage/ChatPage';
+import Signin from './Components/Signin/Signin';
+import Signup from './Components/Signup/Signup';
 
 function App() {
   const browserRouter = createBrowserRouter([
@@ -24,6 +26,14 @@ function App() {
           element:<ChatPage/>
         }
       ]
+    },
+    {
+      path:'/signin',
+      element:<Signin/>
+    },
+    {
+      path:'/signup',
+      element:<Signup/>
     }
   ])
   return (
