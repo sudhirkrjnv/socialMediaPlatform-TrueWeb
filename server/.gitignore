@@ -1,2 +1,4 @@
 /node_modules
 .env
+/post.controller.js
+.gitignore
