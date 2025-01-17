@@ -19,13 +19,14 @@ function Signin() {
       const res =  await axios.post('http://localhost:8000/api/v1/user/login', input, {
         headers:{
           'Content-Type':'application/json'
-        }
+        },
+        withCredentials:true
       })
       if(res.data.success){
         toast.success(res.data.message);
-        setTimeout(()=>{
-          navigate('/')
-        }, 2000);
+        //setTimeout(()=>{
+        //  navigate('/')
+        //}, 2000);
       }
     } catch (error) {
       toast.error(error.response?.data.message || "something went worng");

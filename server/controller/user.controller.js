@@ -44,7 +44,7 @@ export const login = async(req, res)=>{
         const {email, password} = req.body;
         if(!email || !password){
             return res.status(401).json({
-                message:"Error occured! Please fill required details",
+                message:"Please fill required details",
                 success:false
             })
         }
@@ -77,12 +77,13 @@ export const login = async(req, res)=>{
             gender:user.gender
         }
 
-        return res.cookie('token',token, {httpOnly:true, sameSite:'strict', maxAge:1*24*60*60*1000})
+        return res.cookie('token', token, {httpOnly:true, sameSite:'strict', maxAge:1*24*60*60*1000})
         .json({
             message:`Welcome back ${user.username}`,
             success:true,
             user
         });
+
 
 
     } catch (error) {
