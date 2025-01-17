@@ -1,17 +1,42 @@
 import React, { useState } from 'react';
 import './Signin.css'
+import axios from 'axios';
+import { ToastContainer, toast } from 'material-react-toastify';
+import 'material-react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 function Signin() {
-  const [input, setInput] = useState({username:'ABCD1234', email:"abcd@gmail.com", password:""});
+  const [input, setInput] = useState({username:'', email:"", password:''});
   const inputHandler = (e)=>{
     setInput({...input, [e.target.name]:e.target.value});
+  }
+
+  const navigate = useNavigate();
+
+  const signinHandler = async(e)=>{
+    e.preventDefault();
+    try {
+      const res =  await axios.post('http://localhost:8000/api/v1/user/login', input, {
+        headers:{
+          'Content-Type':'application/json'
+        }
+      })
+      if(res.data.success){
+        toast.success(res.data.message);
+        setTimeout(()=>{
+          navigate('/')
+        }, 2000);
+      }
+    } catch (error) {
+      toast.error(error.response?.data.message || "something went worng");
+    }
   }
   return (
     <>
       <div className='formcontainer'>
         <diV>
           <center><h2>TrueWeb</h2><h5>Signin & Lets Enjoy with Friends, Family and many more 😊...</h5></center>
-          <form>
+          <form onSubmit={signinHandler}>
             <div>
               
               Email<br/><input className='inputbox' type="email" name="email" value={input.email} onChange={inputHandler} /><br/>
@@ -21,6 +46,7 @@ function Signin() {
           </form>
         </diV>
       </div>
+      <ToastContainer/>
     </>
   );
 }

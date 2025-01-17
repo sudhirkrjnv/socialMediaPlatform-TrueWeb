@@ -7,7 +7,7 @@ export const register = async(req, res)=>{
         const{username, email, password} = req.body;
         if(!username || !email || !password){
             return res.status(401).json({
-                message:"Somethig missing !",
+                message:"Please fill all details!",
                 success:false
             });
         }
@@ -28,8 +28,9 @@ export const register = async(req, res)=>{
             password:hashedPassword
         });
 
-        return res.status(201).json({
-            message:"Account Created Successfully!"
+        return res.status(200).json({
+            message:"Account Created Successfully!",
+            success:true
         })
 
 
