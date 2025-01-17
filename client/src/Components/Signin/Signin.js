@@ -24,9 +24,9 @@ function Signin() {
       })
       if(res.data.success){
         toast.success(res.data.message);
-        //setTimeout(()=>{
-        //  navigate('/')
-        //}, 2000);
+        setTimeout(()=>{
+          navigate('/')
+        }, 2000);
       }
     } catch (error) {
       toast.error(error.response?.data.message || "something went worng");
