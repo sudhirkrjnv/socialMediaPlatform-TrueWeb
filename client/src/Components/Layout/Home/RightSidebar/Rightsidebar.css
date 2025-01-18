@@ -1,3 +1,6 @@
 .storiescontainer::-webkit-scrollbar{
     display: none;
 }
+.suggestionsContainer::-webkit-scrollbar{
+    display: none;
+}

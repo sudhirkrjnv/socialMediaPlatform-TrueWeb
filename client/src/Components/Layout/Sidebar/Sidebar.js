@@ -1,4 +1,5 @@
-import { Avatar } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
+import { deepOrange } from '@mui/material/colors';
 import FeedIcon from '@mui/icons-material/Feed';
 import MessageIcon from '@mui/icons-material/Message';
 import ForumIcon from '@mui/icons-material/Forum';
@@ -58,7 +59,7 @@ function Sidebar(){
                 </div>
             </div>
             <div onClick={()=>{sidebarHandler("Profile");setActiveSection("Profile")}} style={{display:'flex', backgroundColor: activeSection === "Profile" ? 'black' : '', color: activeSection === "Profile" ? 'white' : '', fontWeight:'bolder', borderRadius:'1.25rem' }}> 
-                <div className='AvatarCircle'><Avatar/></div>
+                <div><Avatar alt="Sudhir Kumar" src="/broken-image.jpg" sx={{width:40, height:40, bgcolor:deepOrange[400]}}/></div>
                 <div style={{paddingTop:'0.5rem', paddingLeft:'0.5rem'}}>Profile</div>
             </div>
         </div>

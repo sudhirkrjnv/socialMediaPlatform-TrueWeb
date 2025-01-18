@@ -26,13 +26,6 @@
     border-radius: 1rem;
     background-color: aqua;
 }
-.AvatarCircle{
-    height: 2.5rem;
-    width: 2.5rem;
-    background-color: greenyellow;
-    border-radius: 1.25rem;
-    border: 1px solid rgb(210, 206, 206);
-}
 .feeds::-webkit-scrollbar{
     display: none;
 }
