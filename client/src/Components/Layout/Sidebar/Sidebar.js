@@ -1,21 +1,35 @@
 import Avatar from '@mui/material/Avatar';
-import { deepOrange } from '@mui/material/colors';
-import FeedIcon from '@mui/icons-material/Feed';
-import MessageIcon from '@mui/icons-material/Message';
-import ForumIcon from '@mui/icons-material/Forum';
-import GroupIcon from '@mui/icons-material/Group';
-import PermMediaIcon from '@mui/icons-material/PermMedia';
-import SettingsIcon from '@mui/icons-material/Settings';
-
+import {deepOrange} from '@mui/material/colors';
+import {OndemandVideo, Home, Group, Settings, Person, NotificationAddRounded, Logout} from '@mui/icons-material';
+import { MessageCircleMore } from 'lucide-react';
+import shorts from "./shorts.png"
 import {useNavigate} from 'react-router-dom'
 import { useState } from 'react';
+import axios from 'axios';
+import { ToastContainer, toast } from 'material-react-toastify';
+import 'material-react-toastify/dist/ReactToastify.css';
+
 function Sidebar(){
 
-    const [activeSection, setActiveSection] = useState('Home');
+    const [activeSection, setActiveSection] = useState();
     let navigate = useNavigate();
 
     const activeSectionHandler = (section)=>{
         setActiveSection(section);
+    }
+
+    const logoutHandler = async()=>{
+        try {
+            const res = await axios.get('http://localhost:8000/api/v1/user/logout', {withCredentials:true});
+            if(res.data.success){
+                toast.success(res.data.message);
+                setTimeout(()=>{
+                    navigate('/signin');
+                  }, 2000);
+            }
+        } catch (error) {
+            toast.error(error.response?.data.message || "something went worng");
+        }
     }
 
     const sidebarHandler = (textType)=>{
@@ -23,12 +37,25 @@ function Sidebar(){
             navigate("/");
         }else if(textType === 'Profile') {
             navigate("/Profile");
-        }else if(textType === 'Messages') {
+        }else if(textType === 'Chat') {
             navigate("/ChatPage");
-        };
+        }else if(textType === 'Logout') {
+            logoutHandler();
+        }
+        
     }
 
-    const sidebarItems = [{icon:<FeedIcon/>,text:"Home"}, {icon:<MessageIcon/>,text:"Messages"}, {icon:<ForumIcon/>,text:"Forums"}, {icon:<GroupIcon/>,text:"Connections"}, {icon:<PermMediaIcon/>,text:"Media"}, {icon:<SettingsIcon/>,text:"Settings"}]
+    const sidebarItems = [
+        {icon:<Home/>,text:"Home"}, 
+        {icon:<MessageCircleMore/>,text:"Chat"}, 
+        {icon:<NotificationAddRounded/>,text:"Notification"}, 
+        {icon:<Group/>,text:"Connection"}, 
+        {icon:<OndemandVideo/>,text:"Media"},
+        {icon:<Avatar style={{position:'relative', right:'0.5vw', top:'-0.8vh'}} src={shorts} sx={{width:40, height:40, "& img": {width: "60%",height: "60%",objectFit: "contain",opacity:'90%'},}}/>,text:<div style={{position:'relative', right:'1vw'}}>Shorts</div>}, 
+        {icon:<Person/>,text:"Profile"},
+        {icon:<Settings/>,text:"Settings"},
+        {icon:<Logout/>,text:"Logout"}
+    ]
 
     return(
         <>
@@ -46,23 +73,13 @@ function Sidebar(){
                     }
                 )}
             </div>
-            <div>
-                <div style={{fontWeight:'bold'}}>Explore :</div>
-                <div style={{height:'28vh', width:'14vw', display:'flex', flexWrap:'wrap',justifyContent:'center',alignItems:'center', gap:'0.5rem',overflow:'hidden', border:'1px solid #BDBDBD'}}>
-                    {
-                        [1,2,3,4].map((item, index)=>{
-                            return(
-                                <div key={index} style={{height:'6rem', width:'6rem', border:'1px solid #BDBDBD', flexShrink:'0px'}}></div>
-                            )
-                        })
-                    }
-                </div>
-            </div>
-            <div onClick={()=>{sidebarHandler("Profile");setActiveSection("Profile")}} style={{display:'flex', backgroundColor: activeSection === "Profile" ? 'black' : '', color: activeSection === "Profile" ? 'white' : '', fontWeight:'bolder', borderRadius:'1.25rem' }}> 
+            
+            <div style={{display:'flex',backgroundColor:'gray', fontWeight:'bolder', width:'12vw',borderRadius:'1.25rem' }}> 
                 <div><Avatar alt="Sudhir Kumar" src="/broken-image.jpg" sx={{width:40, height:40, bgcolor:deepOrange[400]}}/></div>
-                <div style={{paddingTop:'0.5rem', paddingLeft:'0.5rem'}}>Profile</div>
+                <div style={{paddingTop:'0.5rem', paddingLeft:'0.5rem'}}>Sudhir Kumar</div>
             </div>
         </div>
+        <ToastContainer/>
         </>
     );
 }
