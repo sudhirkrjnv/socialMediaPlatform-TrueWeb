@@ -60,12 +60,12 @@ function Sidebar(){
     return(
         <>
         <div style={{display:'flex',borderRight:'1px solid black', flexDirection:'column', justifyContent:'space-between', height:'90vh', width:'15vw', marginTop:'0.5rem',marginLeft:'3rem', padding:'1.5rem'}}>
-            <div>
-                <h1 style={{paddingBottom:'1.5rem'}}>TrueWeb</h1>
+            <div style={{display:'flex', flexDirection:'column', gap:'1rem'}}>
+                <div style={{cursor:'pointer', color:'red', fontFamily:'cursive', fontSize:'2rem', fontWeight:'bold'}}>TrueWeb</div>
                 {sidebarItems.map(
                     (item, index)=>{
                         return(
-                            <div style={{padding:'0.8rem', display:'flex',fontWeight:'bold',height:'3vh', width:'11vw', backgroundColor: activeSection === item.text? 'black':'', border: activeSection === item.text? '1px solid black':'',borderRadius:'0.5rem', color: activeSection === item.text? 'White' : ''}} key={index} onClick={()=>{sidebarHandler(item.text); activeSectionHandler(item.text)}} >
+                            <div style={{padding:'0.2rem', cursor:'pointer', display:'flex',fontWeight:'bold',height:'3vh', width:'11vw', backgroundColor: activeSection === item.text? 'gray':'', borderRadius:'0.5rem', color: activeSection === item.text? 'White' : ''}} key={index} onClick={()=>{sidebarHandler(item.text); activeSectionHandler(item.text)}} >
                                 <div>{item.icon}</div>
                                 <div style={{marginBottom:'4rem', marginLeft:'1rem', fontSize:'1.2rem'}}>{item.text}</div>
                             </div>

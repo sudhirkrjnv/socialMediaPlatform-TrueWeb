@@ -1,6 +1,6 @@
 import './Feed.css';
 import Avatar from '@mui/material/Avatar';
-import { deepOrange, red, green , blue, lime} from '@mui/material/colors';
+import { deepOrange, red, green , blue} from '@mui/material/colors';
 import {FavoriteBorder, Favorite, BookmarkBorder, Bookmark, TextsmsOutlined,Textsms, Send, Folder, PhotoCamera, Place} from '@mui/icons-material';
 
 function Feed(){
