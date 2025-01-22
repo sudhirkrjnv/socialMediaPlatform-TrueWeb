@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import './Signin.css'
 import axios from 'axios';
-import { ToastContainer, toast } from 'material-react-toastify';
+import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
+import { setAuthUser } from '../../redux/authSlice';
+ 
 function Signin() {
   const [input, setInput] = useState({username:'', email:"", password:''});
   const inputHandler = (e)=>{
@@ -12,6 +14,7 @@ function Signin() {
   }
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const signinHandler = async(e)=>{
     e.preventDefault();
@@ -23,15 +26,15 @@ function Signin() {
         withCredentials:true
       })
       if(res.data.success){
+        dispatch(setAuthUser(res.data.user));
         toast.success(res.data.message);
-        setTimeout(()=>{
-          navigate('/')
-        }, 2000);
+        navigate('/');
       }
     } catch (error) {
       toast.error(error.response?.data.message || "something went worng");
     }
   }
+
   return (
     <>
       <div className='formcontainer'>
@@ -47,7 +50,6 @@ function Signin() {
           </form>
         </diV>
       </div>
-      <ToastContainer/>
     </>
   );
 }

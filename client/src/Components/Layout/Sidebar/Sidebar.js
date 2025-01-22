@@ -6,13 +6,16 @@ import shorts from "./shorts.png"
 import {useNavigate} from 'react-router-dom'
 import { useState } from 'react';
 import axios from 'axios';
-import { ToastContainer, toast } from 'material-react-toastify';
+import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
+import {useSelector} from 'react-redux';
 
 function Sidebar(){
 
     const [activeSection, setActiveSection] = useState();
     let navigate = useNavigate();
+
+    const {user} = useSelector(store=>store.auth);
 
     const activeSectionHandler = (section)=>{
         setActiveSection(section);
@@ -25,7 +28,7 @@ function Sidebar(){
                 toast.success(res.data.message);
                 setTimeout(()=>{
                     navigate('/signin');
-                  }, 2000);
+                }, 2000);
             }
         } catch (error) {
             toast.error(error.response?.data.message || "something went worng");
@@ -76,10 +79,9 @@ function Sidebar(){
             
             <div style={{display:'flex',backgroundColor:'gray', fontWeight:'bolder', width:'12vw',borderRadius:'1.25rem' }}> 
                 <div><Avatar alt="Sudhir Kumar" src="/broken-image.jpg" sx={{width:40, height:40, bgcolor:deepOrange[400]}}/></div>
-                <div style={{paddingTop:'0.5rem', paddingLeft:'0.5rem'}}>Sudhir Kumar</div>
+                <div style={{paddingTop:'0.5rem', paddingLeft:'0.5rem'}}>{user.name}</div>
             </div>
         </div>
-        <ToastContainer/>
         </>
     );
 }

@@ -8,6 +8,7 @@ function MainLayout(){
             <div style={{marginLeft:'1em'}}>
                 <Outlet/>
             </div>
+            
         </div>
         </>
     );

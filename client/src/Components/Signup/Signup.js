@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './Signup.css'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'material-react-toastify';
+import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 
 
@@ -25,11 +25,7 @@ function Signup() {
       })
       if(res.data.success){
         toast.success(res.data.message);
-        //navigate('/signin');
-        setTimeout(() => {
-          navigate('/signin');
-        }, 2000);
-        //console.log(res.data.message);
+        navigate('/signin');
       }
     } catch (error) {
       toast.error(error.response?.data.message);
@@ -52,7 +48,6 @@ function Signup() {
           </form>
         </diV>
       </div>
-      <ToastContainer />
     </>
   );
 }

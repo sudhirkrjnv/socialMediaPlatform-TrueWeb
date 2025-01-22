@@ -10,7 +10,7 @@ const Dialog = ({open, onClose, children, dialogStyles = {}, overlayStyles = {} 
     }
   };
 
-//  if (!open) return null;
+  if (!open) return null;
 
   return (
     <div ref={dialogRef} onClick={(e)=>{ onInteractOutsideHandler(e) }} style={{position: 'fixed', inset: '0', backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1,  ...overlayStyles }}>
