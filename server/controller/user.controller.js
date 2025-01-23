@@ -74,6 +74,7 @@ export const login = async(req, res)=>{
             name:user.name,
             bio:user.bio,
             profilePicture:user.profilePicture,
+            coverPicture:user.coverPicture,
             gender:user.gender
         }
 

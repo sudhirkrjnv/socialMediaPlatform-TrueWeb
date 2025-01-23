@@ -79,7 +79,7 @@ function Sidebar(){
             
             <div style={{display:'flex',backgroundColor:'gray', fontWeight:'bolder', width:'12vw',borderRadius:'1.25rem' }}> 
                 <div><Avatar alt="Sudhir Kumar" src="/broken-image.jpg" sx={{width:40, height:40, bgcolor:deepOrange[400]}}/></div>
-                <div style={{paddingTop:'0.5rem', paddingLeft:'0.5rem'}}>{user.name}</div>
+                <div style={{paddingTop:'0.5rem', paddingLeft:'0.5rem'}}>{user?.name || "Sudhir Patel"}</div>
             </div>
         </div>
         </>
