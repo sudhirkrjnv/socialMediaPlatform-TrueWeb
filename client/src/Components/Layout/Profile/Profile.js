@@ -1,16 +1,15 @@
-import SchoolIcon from '@mui/icons-material/School';
-import HomeIcon from '@mui/icons-material/Home';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import {School, Home, LocationOn, Favorite, Instagram, WhatsApp} from '@mui/icons-material';
 import coverPhoto from "./cover.jpg"
 import { useRef, useState } from 'react';
 import {useSelector} from 'react-redux';
 import { Avatar } from '@mui/material';
+import Dialog from '../../../utils/dialogUtils';
+import EditProfile from './EditProfile';
+
 function Profile(){
 
     const profilePicRef = useRef();
+    const [open, setOpen] = useState(false);
     const [image, setImage] = useState("");
 
     const {user} = useSelector(store=>store.auth);
@@ -31,24 +30,24 @@ function Profile(){
     const about = [
         {
             type: "Work and Education",
-            items: [{ icon: <SchoolIcon />, dscpn: "Loknayak Jaiprakash Institute of Technology, Chapra" },{ icon: <SchoolIcon />, 
-            dscpn: "Sinha Model High School Danapur, Patna" },{ icon: <SchoolIcon />, dscpn: "Jawahar Navodaya Vidyalaya Barun, Aurangabad" }]
+            items: [{ icon: <School />, dscpn: "Loknayak Jaiprakash Institute of Technology, Chapra" },{ icon: <School />, 
+            dscpn: "Sinha Model High School Danapur, Patna" },{ icon: <School />, dscpn: "Jawahar Navodaya Vidyalaya Barun, Aurangabad" }]
         },
         {
             type: "Current Location",
-            items: [{ icon: <LocationOnIcon />, dscpn: "Patna, India - 800004" }]
+            items: [{ icon: <LocationOn />, dscpn: "Patna, India - 800004" }]
         },
         {
             type: "Permanent Location",
-            items: [{ icon: <HomeIcon />, dscpn: "Bahuara, Aurangabad(BR) - 824112" }]
+            items: [{ icon: <Home />, dscpn: "Bahuara, Aurangabad(BR) - 824112" }]
         },
         {
             type: "Contact & Basic Info.",
-            items: [{ icon: <WhatsAppIcon />, dscpn: "+91 9525207188" },{ icon: <InstagramIcon />, dscpn: "sudhirpatel1225" }]
+            items: [{ icon: <WhatsApp />, dscpn: "+91 9525207188" },{ icon: <Instagram />, dscpn: "sudhirpatel1225" }]
         },
         {
             type: "Family & Relationships",
-            items: [{ icon: <FavoriteIcon />, dscpn: "Single" }]
+            items: [{ icon: <Favorite />, dscpn: "Single" }]
         }
     ]
 
@@ -73,7 +72,14 @@ function Profile(){
                                     <Avatar alt="Profile Pic" style={{ height: '100%', width: '100%', objectFit: 'cover', borderRadius:'1rem' }}/>  
                             }
                         </div>
-                        <button style={{position:'absolute',bottom:'3vh', right:'1vw', borderRadius:'5px',border:'none', backgroundColor:'green'}}><b> 🖋️ Edit Profile</b></button>
+                        <button onClick={(e)=>setOpen(true)} style={{position:'absolute',bottom:'3vh', right:'1vw', borderRadius:'5px',border:'none', backgroundColor:'green'}}>
+                            <b> 🖋️ Edit Profile</b>
+                        </button>
+                        {
+                            open && <Dialog open={open} onClose={() => setOpen(false)} overlayStyles={{display:'flex', justifyContent:'center'}} dialogStyles={{padding: '1rem', top:'1vh' , height:'90vh'}}>
+                                <EditProfile/>
+                            </Dialog>
+                        }
                         <button style={{position:'absolute',bottom:'3vh', right:'9vw', borderRadius:'5px',border:'none', color:'white', backgroundColor:'darkBlue'}}> ➕ Add to Story</button>
                         <div style={{position:'absolute',bottom:'8vh', left:'11vw'}}><h1>{user?.username || "Sudhir Kumar Patel"}</h1></div>
                     </div>
