@@ -68,14 +68,20 @@ export const login = async(req, res)=>{
         const token = await jwt.sign({userId:user._id}, process.env.SECRET_KEY, {expiresIn:'1d'});
 
         user = {
-            _id:user._id,
-            username:user.username,
-            email:user.email,
-            name:user.name,
-            bio:user.bio,
-            profilePicture:user.profilePicture,
-            coverPicture:user.coverPicture,
-            gender:user.gender
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                profilePicture: user.profilePicture,
+                coverPicture: user.coverPicture,
+                name: user.name,
+                bio: user.bio,
+                gender: user.gender,
+                followers: user.followers,
+                following: user.following,
+                workEducation: user.workEducation,
+                locations: user.locations,
+                contactInfo: user.contactInfo,
+                familyRelationships: user.familyRelationships,
         }
 
         return res.cookie('token', token, {httpOnly:true, sameSite:'strict', maxAge:1*24*60*60*1000})

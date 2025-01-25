@@ -72,7 +72,7 @@ function Profile(){
                                     <Avatar alt="Profile Pic" style={{ height: '100%', width: '100%', objectFit: 'cover', borderRadius:'1rem' }}/>  
                             }
                         </div>
-                        <button onClick={(e)=>setOpen(true)} style={{position:'absolute',bottom:'3vh', right:'1vw', borderRadius:'5px',border:'none', backgroundColor:'green'}}>
+                        <button onClick={(e)=>setOpen(true)} style={{position:'absolute',bottom:'3vh', right:'1vw', borderRadius:'5px',border:'none', backgroundColor:'green', padding:'8px'}}>
                             <b> 🖋️ Edit Profile</b>
                         </button>
                         {
@@ -80,7 +80,7 @@ function Profile(){
                                 <EditProfile/>
                             </Dialog>
                         }
-                        <button style={{position:'absolute',bottom:'3vh', right:'9vw', borderRadius:'5px',border:'none', color:'white', backgroundColor:'darkBlue'}}> ➕ Add to Story</button>
+                        <button style={{position:'absolute',bottom:'3vh', right:'9vw', borderRadius:'5px',border:'none', color:'white', backgroundColor:'darkBlue', padding:'8px'}}> ➕ Add to Story</button>
                         <div style={{position:'absolute',bottom:'8vh', left:'11vw'}}><h1>{user?.username || "Sudhir Kumar Patel"}</h1></div>
                     </div>
                     <div style={{height:'50vh', width:'50vw'}}>
