@@ -11,5 +11,4 @@ router.route('/login').post(login);
 router.route('/logout').get(logout);
 router.route('/profile/editProfile').post(isAuthenticated, upload.fields([{name:'profilePicture', maxCount:'1'}, {name:'coverPicture', maxCount:'1'}]), editProfile);
 
-
 export default router;

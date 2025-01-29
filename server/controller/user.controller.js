@@ -78,6 +78,7 @@ export const login = async(req, res)=>{
                 name: user.name,
                 bio: user.bio,
                 gender: user.gender,
+                dob: user.dob,
                 followers: user.followers,
                 following: user.following,
                 workEducation: user.workEducation,
@@ -116,10 +117,11 @@ export const editProfile = async(req, res)=>{
         const userId = req.id;
 
         let {name, bio, gender, workEducation, locations, contactInfo, familyRelationships} = req.body;
+        let {dob} = req.body;
+
         const profilePicture = req.files?.profilePicture?.[0];
         const coverPicture = req.files?.coverPicture?.[0];
 
-        
         if (workEducation && typeof workEducation === "string") {
             workEducation = JSON.parse(workEducation);
         }
@@ -148,21 +150,22 @@ export const editProfile = async(req, res)=>{
 
         let cloudResponse2
         if(coverPicture){
-            const fileUri = getDataUri(profilePicture);
-            cloudResponse2 = cloudinary.uploader.upload(fileUri);
+            const fileUri = await getDataUri(coverPicture);
+            cloudResponse2 = await cloudinary.uploader.upload(fileUri);
         }
 
         if(profilePicture)  user.profilePicture = await cloudResponse1.secure_url;
-        if(coverPicture)  user.cloudResponse2 = await cloudResponse2.secure_url;
+        if(coverPicture)  user.coverPicture = await cloudResponse2.secure_url;
         if(name) user.name = name;
         if(bio) user.bio = bio;
         if(gender) user.gender = gender;
+        if(dob) user.dob = new Date(dob);
         if(workEducation) user.workEducation = workEducation;
         if(locations) user.locations = locations;
         if(contactInfo) user.contactInfo = contactInfo;
         if(familyRelationships) user.familyRelationships = familyRelationships;
 
-         await user.save()
+        await user.save()
 
         return res.status(200).json({
             message:"Account updated Successfully",
