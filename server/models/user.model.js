@@ -27,6 +27,8 @@ const userSchema = new mongoose.Schema(
       instagram: { type: String, default: "" },
     },
     familyRelationships: { type: String, default: "" },
+    post:[{type:mongoose.Schema.Types.ObjectId, ref:"Post", }],
+    bookmark:[{type:mongoose.Schema.Types.ObjectId, ref:"Post", }],
   },
   { timestamps: true }
 );

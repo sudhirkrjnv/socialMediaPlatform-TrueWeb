@@ -3,6 +3,7 @@ import cors from "cors";
 import connectDB from "./utils/db.js";
 import dotenv from "dotenv";
 import userRoute from "./routes/user.route.js";
+import postRoute from "./routes/post.routes.js";
 import cookieParser from "cookie-parser";
 dotenv.config({});
 
@@ -29,6 +30,7 @@ app.use(cors({
 
 // api
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/post", postRoute);
 
 
 
