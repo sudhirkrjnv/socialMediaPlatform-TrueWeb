@@ -4,6 +4,10 @@ import { deepOrange, red, green , blue} from '@mui/material/colors';
 import {FavoriteBorder, Favorite, BookmarkBorder, Bookmark, TextsmsOutlined,Textsms, Send, Folder, PhotoCamera, Place} from '@mui/icons-material';
 import { useRef, useState } from 'react';
 import Dialog from '../../../../utils/dialogUtils';
+import axios from 'axios';
+import { toast } from 'material-react-toastify';
+import 'material-react-toastify/dist/ReactToastify.css';
+import CircularProgress from '@mui/material/CircularProgress';
 
 function Feed(){
 
@@ -13,8 +17,8 @@ function Feed(){
 
     const [file, setFile] = useState("");
     const [caption, setCaption] = useState("");
-    
     const [imagePreview, setImagePreview] = useState("");
+    const [loading, setLoading] = useState(false);
 
     /*const dialogHandler = (e) => {
         if (dialogRef.current === e.target) {
@@ -23,7 +27,7 @@ function Feed(){
     };*/
 
     const fileChangeHandler = (e)=>{
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
         if(file){
             setFile(file);
             const reader = new FileReader();
@@ -35,6 +39,33 @@ function Feed(){
             }
         }
     }
+
+    const createPostHandler = async(e)=>{
+        const formData = new FormData();
+        formData.append("caption", caption);
+        if(imagePreview) formData.append("image", file);
+        try {
+            setLoading(true);
+            const res = await axios.post('http://localhost:8000/api/v1/post/addpost', formData, 
+                {
+                    headers:{
+                        'Content-Type':'multipart/form-data'
+                    }, 
+                    withCredentials:true
+                }
+            );
+            if (res.data.success){
+                toast.success(res.data.message);
+                setOpen(false);
+            }
+        } catch (error) {
+            toast.error(error.response?.data.message || "something went worng");
+        } finally{
+            setLoading(false);
+        }
+      
+    }
+
 
     const liked =[
         {userId:'01', name:"Anjali Kumari"},
@@ -73,25 +104,29 @@ function Feed(){
                                         </div>
                                             <div style={{width:'85%', display:'flex', margin:'auto',paddingTop:'15px', paddingBottom:'15px', borderRadius:'0.5rem'}}>
                                                 {/*        Caption            */}
-                                                <textarea name='caption' value={caption} onChange={(e)=>setCaption(e.target.value)} style={{width:'100%', border:'none', outline:'none', paddingLeft:'10px', paddingRight:'10px'}} type='text' placeholder="About your Post"/>    
+                                                <textarea type='text' placeholder="About your Post" value={caption} onChange={(e)=>setCaption(e.target.value)} style={{width:'100%', border:'none', outline:'none', paddingLeft:'10px', paddingRight:'10px'}} />    
                                             </div>
                                             <div style={{display:'flex', alignItems:'center', height:'60%', width:'85%', justifyContent:'center', backgroundColor:'rgb(189,189,189)', margin:'auto',marginTop:'5px', border:'1px solid black', borderRadius:'1rem'}}>
                                                 {/*        Post Image        */}
                                                 {
-                                                    imagePreview ? <img src={imagePreview} alt="post.image" style={{ width:'100%', height:'100%', objectFit:'contain', borderRadius:'1rem'}}/> : 
-                                                    <div>
+                                                    imagePreview ? <img src={imagePreview} alt="post.image" style={{ width:'100%', height:'100%', objectFit:'contain', borderRadius:'1rem'}}/> 
+                                                        : 
+                                                        <div>
                                                             <input ref={imageRef} type='file' onChange={(e)=>fileChangeHandler(e)} style={{zIndex:'-1' ,position:'absolute' }}/>
-                                                                <div onClick={()=>imageRef.current.click()} style={{ backgroundColor:'blue',cursor:'pointer', color:'white', display:'flex', justifyContent:'center', alignItems:'center', height:'6vh', width:'15vw', borderRadius:'1rem'}}>
-                                                                    <span>Choose from Computer</span>
-                                                                </div>
+                                                            <div onClick={()=>imageRef.current.click()} style={{ backgroundColor:'blue',cursor:'pointer', color:'white', display:'flex', justifyContent:'center', alignItems:'center', height:'6vh', width:'15vw', borderRadius:'1rem'}}>
+                                                                <span>Choose from Computer</span>
+                                                            </div>
                                                         </div>
                                                 }
                                             </div>
+                                            { /* Submit Section */}
                                             <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',marginRight:'5vw', height:'15%', margin:'auto'}}>
                                                 {
-                                                    imagePreview ? <button  type="submit" style={{borderRadius:'0.5rem', cursor:'pointer', border:'none',height:'50%', width:'15%', backgroundColor: 'green', opacity: '100%', color:'white'}}>
+                                                    imagePreview ? (loading ? <button  type="submit" onClick={(e)=>createPostHandler(e)} style={{borderRadius:'0.5rem', cursor:'pointer', border:'none',height:'50%', width:'20%', backgroundColor: 'green', opacity: '100%', color:'white', display:'flex', alignItems:'center', justifyContent:'center', gap:'1vw'}}>
+                                                        Please wait <CircularProgress size={18}  style={{color:'#fff'}}/></button> : 
+                                                    <button  type="submit" onClick={(e)=>createPostHandler(e)} style={{borderRadius:'0.5rem', cursor:'pointer', border:'none',height:'50%', width:'15%', backgroundColor: 'green', opacity: '100%', color:'white'}}>
                                                         Submit
-                                                    </button> : <button style={{borderRadius:'0.5rem', cursor:'pointer', border:'none',height:'50%', width:'15%', backgroundColor:'gray', opacity: '10%',color:'white'}}>
+                                                    </button>) : <button style={{borderRadius:'0.5rem', cursor:'pointer', border:'none',height:'50%', width:'15%', backgroundColor:'gray', opacity: '10%',color:'white'}}>
                                                         Submit
                                                     </button>
                                                 }
