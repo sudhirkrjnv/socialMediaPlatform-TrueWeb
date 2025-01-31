@@ -75,7 +75,7 @@ function RightSidebar(){
                     </div>
                 </div>
                 <div style={{marginLeft:'2rem'}}><h2>Shorts</h2>
-                    <div className='shortscontainer' style={{display:'flex', alignItems:'center',paddingLeft:'0.5rem', flexDirection:'row',height:'10rem', width:'24rem', overflowX:'auto', scrollBehavior:'smooth', gap:'0.5rem'}}>
+                    <div className='scrolldisable' style={{display:'flex', alignItems:'center',paddingLeft:'0.5rem', flexDirection:'row',height:'10rem', width:'24rem', overflowX:'auto', scrollBehavior:'smooth', gap:'0.5rem'}}>
                         {
                             shorts.map((item,index)=>{
                                 return(
