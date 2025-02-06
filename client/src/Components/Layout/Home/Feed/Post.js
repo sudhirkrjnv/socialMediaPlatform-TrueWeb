@@ -2,11 +2,53 @@ import React from 'react'
 import Avatar from '@mui/material/Avatar';
 import { deepOrange, red, green , blue} from '@mui/material/colors';
 import {FavoriteBorder, Favorite, BookmarkBorder, Bookmark, TextsmsOutlined,Textsms,MoreVert} from '@mui/icons-material';
+import { toast } from 'material-react-toastify';
+import 'material-react-toastify/dist/ReactToastify.css';
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import { setPosts } from '../../../../redux/postSlice';
 
-export default function Post({post}) {
+function Post({post}) {
 
+    
+    const {user} = useSelector(store=>store.auth);
+    const {posts} = useSelector(store=>store.post);
+    
+    const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
+    const [likeCount, setLikeCount] = useState(post.likes.length);
+
+    const dispatch = useDispatch();
+    
     const [text, setText] = useState("");
+
+    const likeOrDislikeHandler = async()=>{
+        try {
+            const action = liked? 'dislike' : 'like';
+            const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/${action}`, {withCredentials:true});
+            
+            if(res.data.success){
+                const updatedLikeCount = liked? likeCount-1 : likeCount+1;
+                setLikeCount(updatedLikeCount); 
+                setLiked(!liked);
+
+                //updating post like and dislike data in store
+                const updatedPostData = posts.map((p) =>
+                    p._id === post._id
+                        ? {
+                            ...p,
+                            likes: liked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
+                        }
+                        : p
+                );
+                
+                dispatch(setPosts(updatedPostData));
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            toast.error(error.response?.data.message || "Something went wrong");
+        }
+    }
 
     const inputTextHandler = (e)=>{
         const inputText = e.target.value;
@@ -44,7 +86,8 @@ export default function Post({post}) {
                     </div>
                     <div style={{display:'flex',paddingLeft:'2rem', paddingRight:'1rem',marginTop:'0.5rem', marginBottom:'0.5rem', gap:'2.5vw'}}>
                         {
-                            (post?.likes)? (<div style={{cursor:'pointer'}}><Favorite sx={{width:25, height:25, color:red[800]}}/><span style={{position:'relative', bottom:'8px'}}>&nbsp;{post?.likes?.length} Likes </span></div>) : (<div style={{cursor:'pointer'}}><FavoriteBorder sx={{width:25, height:25}}/> <span style={{position:'relative', top:'-6px'}}> &nbsp;0 Likes</span></div>)
+                            liked ? <div style={{cursor:'pointer'}}><Favorite onClick={likeOrDislikeHandler} sx={{width:25, height:25, color:red[800]}}/><span style={{position:'relative', bottom:'8px'}}> {likeCount} Likes </span></div> : <div style={{cursor:'pointer'}}><FavoriteBorder onClick={likeOrDislikeHandler} sx={{width:25, height:25}}/> <span style={{position:'relative', bottom:'8px'}}> {likeCount} Likes </span></div>
+                            
                         }
                         {
                             (post?.Comments)? (<div style={{cursor:'pointer'}}><Textsms sx={{width:24, height:24, color:blue[800]}}/><span style={{position:'relative', bottom:'8px'}}>&nbsp;{post?.omments?.length} Comments </span></div>) : (<div style={{cursor:'pointer'}}><TextsmsOutlined sx={{width:24, height:24}}/><span style={{position:'relative', top:'-6px'}}>&nbsp;0 Comments </span></div>)
@@ -68,3 +111,5 @@ export default function Post({post}) {
         </>
     )
 }
+
+export default Post;
