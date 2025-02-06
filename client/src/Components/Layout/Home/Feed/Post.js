@@ -97,7 +97,7 @@ function Post({post}) {
     return (
         <>
             <div style={{display:'flex', flexDirection:'column', flex:'1'}}>          
-                <div style={{backgroundColor:'white', height:'78vh', width:'43vw', marginBottom:'1rem', marginLeft:'4.5rem', borderRadius:'1.2rem', boxShadow:'0px 4px 6px #ccc'}}>
+                <div style={{backgroundColor:'#fff', overflow:'hidden', width:'43vw', marginBottom:'1rem', marginLeft:'4.5rem', borderRadius:'1.2rem', boxShadow:'0px 4px 6px #ccc'}}>
                     <div style={{display:'flex', justifyContent:'space-between', padding:'0.8rem 1rem 0.5rem 2rem' , fontWeight:'bold'}}>
                         {/*     Avatar Section    */}
                         <div style={{display:'flex', cursor:'pointer'}}>
@@ -110,11 +110,9 @@ function Post({post}) {
                         <div style={{cursor:'pointer'}}><MoreVert/></div>
                     </div>
                     {/*      Captions     */}
-                    <div style={{paddingLeft:'1rem'}}>
-                        <textarea type='text' value={post?.caption || ""}  readOnly='true' style={{cursor:'pointer',border:'none', outline:'none', width:'95%',fontFamily:'Segoe UI', lineHeight:'1.2rem', wordSpacing:'0.4rem', display:'flex', alignItems:'center'}}/>
-                    </div>
+                    <div style={{padding:'10px' ,paddingLeft:'1rem', cursor:'pointer', display:'block',fontFamily:'Segoe UI', lineHeight:'1.2rem', wordSpacing:'0.4rem', width:'95%', display:'flex', alignItems:'center'}}>{post?.caption || ""}</div>
                     {/*     Post Image    */}
-                    <div style={{margin:'auto', width:'98%', height:'65%', border:'1px solid #666', borderRadius:'1rem', backgroundColor:'#eee', overflow:'hidden'}}>
+                    <div style={{margin:'auto', width:'98%', height:'50vh', border:'1px solid #666', borderRadius:'1rem', backgroundColor:'#eee', overflow:'hidden'}}>
                         <img src={post?.image} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
                     </div>
                     <div style={{display:'flex',paddingLeft:'2rem', paddingRight:'1rem',marginTop:'0.5rem', marginBottom:'0.5rem', gap:'2.5vw'}}>
@@ -130,7 +128,7 @@ function Post({post}) {
                             Bookmarks? <div style={{cursor:'pointer'}}><Bookmark sx={{width:25, height:25, color:green[800]}}/> <span style={{position:'relative', top:'-6px'}}>Bookmarked </span></div> : <div style={{cursor:'pointer'}}> <BookmarkBorder/>Bookmark</div>
                         }
                     </div>
-                    <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'1vw'}}>
+                    <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'1vw', marginBottom:'10px'}}>
                         <div style={{display:'flex',height:'2rem', width:'85%', borderRadius:'0.5rem', alignItems:'center'}}>
                             <input type='text' value={commented_text} onChange={inputTextHandler} placeholder='comment this post ...✍️' className='scrolldisable' style={{border:'none',outline:'none', padding:'10px',height:'100%', width:'100%', display:'flex', alignItems:'center'}} /> 
                         </div>
