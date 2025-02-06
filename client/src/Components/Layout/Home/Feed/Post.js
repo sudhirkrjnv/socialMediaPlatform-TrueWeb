@@ -20,7 +20,10 @@ function Post({post}) {
 
     const dispatch = useDispatch();
     
-    const [text, setText] = useState("");
+    const [commented_text, setCommented_text] = useState("");
+    const [comment, setComment] = useState(post.comments);
+
+
 
     const likeOrDislikeHandler = async()=>{
         try {
@@ -46,15 +49,45 @@ function Post({post}) {
                 toast.success(res.data.message);
             }
         } catch (error) {
-            toast.error(error.response?.data.message || "Something went wrong");
+            toast.error(error.response?.data.messege);
+        }
+    }
+    
+    const commentHandler = async()=>{
+        try {
+            const res =  await axios.post(`http://localhost:8000/api/v1/post/${post._id}/addcomment`, {commented_text}, {
+                headers:{
+                  'Content-Type':'application/json'
+                },
+                withCredentials:true
+            })
+            
+            if(res.data.success){
+                const updatedCommentData = [...comment, res.data.comment];
+                setComment(updatedCommentData);
+                
+                const updatedPostData = posts.map(p=>
+                    p._id === post._id ?
+                    {...p, comments:updatedCommentData} : p
+                );
+                
+                dispatch(setPosts(updatedPostData));
+                toast.success(res.data.message);
+                setCommented_text("");
+                
+            }
+
+        } catch (error) {
+            toast.error(error.response?.data.messege);
+            console.log(error);
         }
     }
 
     const inputTextHandler = (e)=>{
         const inputText = e.target.value;
         if(inputText.trim()){
-            setText(inputText);
-        } else setText("");
+            setCommented_text(inputText);
+        } else setCommented_text("");
     }
 
     const Bookmarks =[
@@ -89,10 +122,9 @@ function Post({post}) {
                             liked ? <div style={{cursor:'pointer'}}><Favorite onClick={likeOrDislikeHandler} sx={{width:25, height:25, color:red[800]}}/><span style={{position:'relative', bottom:'8px'}}> {likeCount} Likes </span></div> : <div style={{cursor:'pointer'}}><FavoriteBorder onClick={likeOrDislikeHandler} sx={{width:25, height:25}}/> <span style={{position:'relative', bottom:'8px'}}> {likeCount} Likes </span></div>
                             
                         }
-                        {
-                            (post?.Comments)? (<div style={{cursor:'pointer'}}><Textsms sx={{width:24, height:24, color:blue[800]}}/><span style={{position:'relative', bottom:'8px'}}>&nbsp;{post?.omments?.length} Comments </span></div>) : (<div style={{cursor:'pointer'}}><TextsmsOutlined sx={{width:24, height:24}}/><span style={{position:'relative', top:'-6px'}}>&nbsp;0 Comments </span></div>)
-                        }                                          
-                        <div style={{cursor:'pointer'}}> Say nice👌</div>
+                        
+                        <div style={{cursor:'pointer',display:'flex', gap:'5px'}}><TextsmsOutlined sx={{width:24, height:24}} style={{position:'relative', top:'2px'}}/><span style={{position:'relative', top:'1px'}}>{comment.length} Comments </span></div>
+                                                                 
                         <hr/>
                         {
                             Bookmarks? <div style={{cursor:'pointer'}}><Bookmark sx={{width:25, height:25, color:green[800]}}/> <span style={{position:'relative', top:'-6px'}}>Bookmarked </span></div> : <div style={{cursor:'pointer'}}> <BookmarkBorder/>Bookmark</div>
@@ -100,10 +132,10 @@ function Post({post}) {
                     </div>
                     <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'1vw'}}>
                         <div style={{display:'flex',height:'2rem', width:'85%', borderRadius:'0.5rem', alignItems:'center'}}>
-                            <textarea type='text' value={text} onChange={inputTextHandler} placeholder='comment this post ...✍️' className='scrolldisable' style={{cursor:'pointer', border:'none',outline:'none', padding:'10px',height:'100%', width:'100%', display:'flex', alignItems:'center'}} /> 
+                            <input type='text' value={commented_text} onChange={inputTextHandler} placeholder='comment this post ...✍️' className='scrolldisable' style={{border:'none',outline:'none', padding:'10px',height:'100%', width:'100%', display:'flex', alignItems:'center'}} /> 
                         </div>
                         {
-                            text && <div style={{color:'darkBlue'}}><b>Send</b></div>
+                            commented_text && <div onClick={commentHandler} style={{color:'darkBlue', cursor:'pointer'}}><b>Send</b></div>
                         }
                     </div>
                 </div>                         
