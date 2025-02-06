@@ -8,7 +8,9 @@ import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@mui/material/CircularProgress';
 import useGetAllPost from '../../../../Hooks/useGetAllPosts';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { setPosts } from '../../../../redux/postSlice';
+
 
 function Feed(){
     
@@ -25,6 +27,8 @@ function Feed(){
     useGetAllPost();
 
     const {posts} = useSelector(store=>store.post)
+
+    const dispatch = useDispatch();
 
 
     const fileChangeHandler = (e)=>{
@@ -63,6 +67,7 @@ function Feed(){
                 }
             );
             if (res.data.success){
+                dispatch(setPosts([res.data.post, ...posts]));
                 toast.success(res.data.message);
                 setOpen(false);
             }
