@@ -4,7 +4,7 @@ import { deepOrange, red, green} from '@mui/material/colors';
 import {FavoriteBorder, Favorite, BookmarkBorder, Bookmark, TextsmsOutlined, MoreVert} from '@mui/icons-material';
 import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setPosts } from '../../../../redux/postSlice';
@@ -85,9 +85,17 @@ function Post({post}) {
 
         } catch (error) {
             toast.error(error.response?.data.messege);
-            console.log(error);
         }
     }
+
+    useEffect(() => {
+        if (comment_open) {
+            const updatedPost = posts.find((p) => p._id === post._id);
+            if (updatedPost) {
+                setComment(updatedPost.comments);
+            }
+        }
+    }, [comment_open, posts]);
 
     const inputTextHandler = (e)=>{
         const inputText = e.target.value;
