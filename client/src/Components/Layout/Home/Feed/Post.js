@@ -1,7 +1,7 @@
 import React from 'react'
 import Avatar from '@mui/material/Avatar';
-import { deepOrange, red, green , blue} from '@mui/material/colors';
-import {FavoriteBorder, Favorite, BookmarkBorder, Bookmark, TextsmsOutlined,Textsms,MoreVert} from '@mui/icons-material';
+import { deepOrange, red, green} from '@mui/material/colors';
+import {FavoriteBorder, Favorite, BookmarkBorder, Bookmark, TextsmsOutlined, MoreVert} from '@mui/icons-material';
 import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 import { useState } from 'react';
@@ -10,7 +10,7 @@ import axios from 'axios';
 import { setPosts } from '../../../../redux/postSlice';
 import Dialog from '../../../../utils/dialogUtils.js';
 import CommentDialog from './CommentDialog.js';
-
+import { setSelectedPost } from '../../../../redux/postSlice';
 
 function Post({post}) {
 
@@ -127,9 +127,9 @@ function Post({post}) {
                             
                         }
                         
-                        <div style={{cursor:'pointer',display:'flex', gap:'5px'}} onClick={()=>setComment_open(true)}><TextsmsOutlined sx={{width:24, height:24}} style={{position:'relative', top:'2px'}}/><span style={{position:'relative', top:'1px'}}>{comment.length} Comments </span></div>
+                        <div style={{cursor:'pointer',display:'flex', gap:'5px'}} onClick={()=>{dispatch(setSelectedPost(post));setComment_open(true)} }><TextsmsOutlined sx={{width:24, height:24}} style={{position:'relative', top:'2px'}}/><span style={{position:'relative', top:'1px'}}>{comment.length} Comments </span></div>
                         <Dialog open={comment_open} onClose={() => setComment_open(false)} overlayStyles={{display:'flex', justifyContent:'center'}} dialogStyles={{padding: '1rem', top:'15vh', width:'60vw', height:'50vh' }}>
-                            <CommentDialog post={post}/>
+                            <CommentDialog post={post} commentHandler={commentHandler}  commented_text={commented_text} setCommented_text={setCommented_text} inputTextHandler={inputTextHandler}/>
                         </Dialog>                                         
                         <hr/>
                         {

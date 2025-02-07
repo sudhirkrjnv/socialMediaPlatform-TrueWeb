@@ -48,7 +48,13 @@ export const addPost = async(req, res)=>{
 export const getAllPost = async(req, res)=>{
     try {
         const posts = await Post.find()
-            .populate({path:'author', select:'name profilePicture bio'});
+            .sort({ createdAt: -1 })
+            .populate({ path: 'author', select: 'name profilePicture bio' })
+            .populate({
+                path: 'comments',
+                options: { sort: { createdAt: -1 } },
+                populate: { path: 'author', select: 'name profilePicture' }
+            });
 
         return res.status(200).json({
             posts,
@@ -129,9 +135,10 @@ export const addComment = async(req, res)=>{
             post:postKiId
         })
 
+        await comment.populate({path:'author', select:'profilePicture name bio'});
+
         post.comments.push(comment._id);
 
-        await comment.populate({path:'author', select:'profilePicture name bio'});
 
         await post.save();
 

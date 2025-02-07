@@ -1,15 +1,12 @@
+import { Avatar } from '@mui/material';
 import React , {useState} from 'react'
+import { useSelector } from 'react-redux';
 
-function CommentDialog({post}) {
+function CommentDialog({post, commentHandler, commented_text, inputTextHandler}) {
+    
+    //const [commented_text, setCommented_text] = useState("");
 
-    const [text, setText] = useState("");
-
-    const changeEventHandler = (e)=>{
-       const inputText = e.target.value;
-       if(inputText.trim()){
-        setText(inputText);
-       } else setText("")
-    }
+    //const {selectedPost} = useSelector(store=>store.post);
 
     return (
         <>    
@@ -24,9 +21,16 @@ function CommentDialog({post}) {
                     {/* All Comments of This Post */}
                     <div className='scrolldisable' style={{height:'42vh', overflow:'scroll'}}>
                         {
-                            (post?.comments)?.map((Comment)=>
-                                <div key={Comment._id} style={{display:'flex', flexDirection:'column'}}>
-                                    <div>{Comment}</div>
+                            (post?.comments)?.map((cmt)=>
+                                <div key={cmt._id} style={{display:'flex', flexDirection:'column', gapY:'1rem'}}>
+                                    <div style={{display:'flex', justifyContent:'flex-start', color:'blue', marginTop:'5px', marginLeft:'5px', alignItems:'center'}}>
+                                        <div>
+                                            <Avatar alt="autar" src={cmt?.author?.profilePicture} sx={{width:40, height:40, bgcolor:'#eee'}}/>
+                                        </div>
+                                        <div style={{backgroundColor:'#eee', minHeight:'1rem', maxWidth:'85%', padding:'0.2rem 0.2rem 0.2rem 0.2rem', borderRadius:'0.5rem', fontFamily:'cursive', fontSize:'small'}}>
+                                            <b>{cmt?.commented_text}</b>
+                                        </div>
+                                    </div>
                                 </div>
                             )
                         }
@@ -34,10 +38,10 @@ function CommentDialog({post}) {
                     {/* Text Input and Send Button */}
                     <div style={{margin:'10px'}}>
                         <div style={{display:'flex', justifyContent:'space-between', margin:'0 1vw 0 1vw'}}>
-                            <input type='text' value={text} onChange={(e)=>changeEventHandler(e)} placeholder='Comment this Post ... ' style={{borderRadius:'5px', outlineColor:'#ddd',border:'#ddd', width:'80%', padding:'8px', backgroundColor:'#eee'}}/>
+                            <input type='text' value={commented_text} onChange={inputTextHandler} placeholder='Comment this Post ... ' style={{borderRadius:'5px', outlineColor:'#ddd',border:'#ddd', width:'80%', padding:'8px', backgroundColor:'#eee'}}/>
                             {
-                                text && 
-                                    <button disabled={!text.trim()} style={{color:'darkBlue', border:'none'}}><b>SEND</b></button>
+                                commented_text && 
+                                    <button onClick={commentHandler} disabled={!commented_text.trim()} style={{color:'darkBlue', border:'none'}}><b>SEND</b></button>
                             }
                         </div>
                     </div>
