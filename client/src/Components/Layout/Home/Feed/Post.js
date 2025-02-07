@@ -8,6 +8,9 @@ import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setPosts } from '../../../../redux/postSlice';
+import Dialog from '../../../../utils/dialogUtils.js';
+import CommentDialog from './CommentDialog.js';
+
 
 function Post({post}) {
 
@@ -22,6 +25,9 @@ function Post({post}) {
     
     const [commented_text, setCommented_text] = useState("");
     const [comment, setComment] = useState(post.comments);
+
+    const [comment_open, setComment_open] = useState(false);
+
 
 
 
@@ -121,8 +127,10 @@ function Post({post}) {
                             
                         }
                         
-                        <div style={{cursor:'pointer',display:'flex', gap:'5px'}}><TextsmsOutlined sx={{width:24, height:24}} style={{position:'relative', top:'2px'}}/><span style={{position:'relative', top:'1px'}}>{comment.length} Comments </span></div>
-                                                                 
+                        <div style={{cursor:'pointer',display:'flex', gap:'5px'}} onClick={()=>setComment_open(true)}><TextsmsOutlined sx={{width:24, height:24}} style={{position:'relative', top:'2px'}}/><span style={{position:'relative', top:'1px'}}>{comment.length} Comments </span></div>
+                        <Dialog open={comment_open} onClose={() => setComment_open(false)} overlayStyles={{display:'flex', justifyContent:'center'}} dialogStyles={{padding: '1rem', top:'15vh', width:'60vw', height:'50vh' }}>
+                            <CommentDialog post={post}/>
+                        </Dialog>                                         
                         <hr/>
                         {
                             Bookmarks? <div style={{cursor:'pointer'}}><Bookmark sx={{width:25, height:25, color:green[800]}}/> <span style={{position:'relative', top:'-6px'}}>Bookmarked </span></div> : <div style={{cursor:'pointer'}}> <BookmarkBorder/>Bookmark</div>
