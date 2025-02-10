@@ -28,6 +28,8 @@ function Post({post}) {
 
     const [comment_open, setComment_open] = useState(false);
 
+    const [deletePostOpen, setDeletePostOpen] = useState(false);
+
 
 
 
@@ -41,7 +43,6 @@ function Post({post}) {
                 setLikeCount(updatedLikeCount); 
                 setLiked(!liked);
 
-                //updating post like and dislike data in store
                 const updatedPostData = posts.map((p) =>
                     p._id === post._id
                         ? {
@@ -97,6 +98,21 @@ function Post({post}) {
         }
     }, [comment_open, posts]);
 
+    const deletePostHandler = async()=>{
+        try {
+            const res = await axios.delete(`http://localhost:8000/api/v1/post/deletepost/${post?._id}`, { withCredentials: true });
+            
+            if(res.data.success){
+                const updatedPostData = posts.filter( (postItem) => postItem?._id !== post?._id);
+                dispatch(setPosts(updatedPostData));
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            toast.error(error.response.data?.messege);
+        }
+    }
+
+
     const inputTextHandler = (e)=>{
         const inputText = e.target.value;
         if(inputText.trim()){
@@ -121,7 +137,25 @@ function Post({post}) {
                                 <div style={{paddingLeft:'1rem', fontWeight:'lighter', color:'#666', fontSize:'small'}}>{post?.author?.bio}</div>
                             </div>
                         </div>
-                        <div style={{cursor:'pointer'}}><MoreVert/></div>
+                        {/* DELETE POST DIALOG */}
+                        <div  onClick={()=>{setDeletePostOpen(true)}} style={{cursor:'pointer'}}><MoreVert/></div>
+                        <Dialog open={deletePostOpen} onClose={() => setDeletePostOpen(false)} overlayStyles={{display:'flex', justifyContent:'center'}} dialogStyles={{padding: '1rem', top:'20vh', width:'35vw', height:'35vh' }}>
+                            <div style={{display:'flex', flexDirection:'column',alignItems:'center', height:'30vh', justifyContent:'space-evenly', marginTop:'2vh' }}>
+                                {
+                                    user?._id !== post?.author?._id &&
+                                        <button style={{height:'5vh', padding:'10px', width:'30vh', borderRadius:'5px', border:'none', backgroundColor:'#ccc'}}><b>Follow</b></button>
+                                }      
+                                <button style={{height:'5vh', padding:'10px', width:'30vh', borderRadius:'5px', border:'none', backgroundColor:'#ccc'}}><b>Add to Favorite</b></button>
+                                {
+                                    user?._id !== post?.author?._id &&
+                                    <button style={{height:'5vh', padding:'10px', width:'30vh', borderRadius:'5px', border:'none', backgroundColor:'#ccc'}}><b>Chat with Author</b></button>
+                                }      
+                                {
+                                    user && user?._id === post?.author?._id && 
+                                        <button onClick={deletePostHandler} style={{height:'5vh', padding:'10px', width:'30vh', borderRadius:'5px', border:'none', backgroundColor:'#ccc'}}><b>Delete Post</b></button>
+                                }
+                            </div>
+                        </Dialog>
                     </div>
                     {/*      Captions     */}
                     <div style={{padding:'10px' ,paddingLeft:'1rem', cursor:'pointer', display:'block',fontFamily:'Segoe UI', lineHeight:'1.2rem', wordSpacing:'0.4rem', width:'95%', display:'flex', alignItems:'center'}}>{post?.caption || ""}</div>
@@ -134,10 +168,11 @@ function Post({post}) {
                             liked ? <div style={{cursor:'pointer'}}><Favorite onClick={likeOrDislikeHandler} sx={{width:25, height:25, color:red[800]}}/><span style={{position:'relative', bottom:'8px'}}> {likeCount} Likes </span></div> : <div style={{cursor:'pointer'}}><FavoriteBorder onClick={likeOrDislikeHandler} sx={{width:25, height:25}}/> <span style={{position:'relative', bottom:'8px'}}> {likeCount} Likes </span></div>
                             
                         }
-                        
+                        {/* COMMENT SECTION */}
                         <div style={{cursor:'pointer',display:'flex', gap:'5px'}} onClick={()=>{dispatch(setSelectedPost(post));setComment_open(true)} }><TextsmsOutlined sx={{width:24, height:24}} style={{position:'relative', top:'2px'}}/><span style={{position:'relative', top:'1px'}}>{comment.length} Comments </span></div>
+                            {/* Comment Dialog */}
                         <Dialog open={comment_open} onClose={() => setComment_open(false)} overlayStyles={{display:'flex', justifyContent:'center'}} dialogStyles={{padding: '1rem', top:'15vh', width:'60vw', height:'50vh' }}>
-                            <CommentDialog post={post} commentHandler={commentHandler}  commented_text={commented_text} setCommented_text={setCommented_text} inputTextHandler={inputTextHandler}/>
+                            <CommentDialog/>
                         </Dialog>                                         
                         <hr/>
                         {

@@ -154,23 +154,35 @@ export const addComment = async(req, res)=>{
     }
 }
 
-export const getPostComment = async (req, res)=>{
+export const deletePost = async(req, res)=>{
     try {
         const postKiId = req.params.id;
+        const authorKiId = req.id;
 
-        const comments = await Comment.find({post:postKiId})
-            .populate({path:'author', select:'profilePicture name bio'});
-        
-        if(!comments){
-            return res.json({
-                message:"Comments not found or May be not exists",
-                success:false,
+        const post = await Post.findById(postKiId);
+        if(!post){
+            return res.status(401).json({
+                message:"Post not found",
+                success:false
+            })
+        }
+        if(post.author.toString() !== authorKiId){
+            return res.status(401).json({
+                message:'Unauthorized !',
+                success:'false'
             })
         }
 
+        await Post.findByIdAndDelete(postKiId);
+
+        let user = await User.findById(authorKiId);
+        user.post = user.post.filter(id =>id.toString()!== postKiId)
+
+        await Comment.deleteMany({post:postKiId})
+
         return res.status(200).json({
-            success:true,
-            comments
+            message:"Post Deleted",
+            success:true
         })
 
     } catch (error) {
