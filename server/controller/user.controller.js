@@ -176,3 +176,35 @@ export const editProfile = async(req, res)=>{
         console.log(error);
     }
 }
+
+export const getfollowers = async (req, res) => {
+    try {
+        const { searchTerm } = req.body;
+        if (!searchTerm) {
+            return res.status(400).json({
+                message: "Search term is required",
+                success: false
+            });
+        }
+
+        const followers = await User.find({
+            $and: [
+                { _id: { $ne: req.id } },
+                {
+                    $or: [
+                        { name: { $regex: searchTerm, $options: 'i' } },
+                        { username: { $regex: searchTerm, $options: 'i' } } 
+                    ]
+                }
+            ]
+        }).select("-password"); 
+
+        return res.status(200).json({
+            followers: followers,
+            message: "Searched successfully!",
+            success: true
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
