@@ -11,6 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 function EditProfile({onClose}){
 
     const {user} = useSelector(store=>store.auth);
+    
  
     const coverImageRef = useRef();
     const profilePicRef = useRef();

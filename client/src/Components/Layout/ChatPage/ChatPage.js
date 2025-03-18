@@ -1,30 +1,16 @@
 import { useState} from 'react';
+import { useDispatch} from 'react-redux';
+import {setSelectedChatType, setSelectedChatData} from '../../../redux/ChatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import axios from 'axios';
 import MessagesContainer from './MessagesContainer/MessagesContainer';
+import { Search } from '@mui/icons-material';
 
 function ChatPage(){
 
-    let suggestedUsers = [
-        {username : "Sudhir Kumar"},
-        {username : "Ritesh Kumar"},
-        {username : "Prem Prakash"},
-        {username : "Rajeev Kumar"},
-        {username : "Gyanchand Kumar"},
-        {username : "Rahul Kumar"},
-        {username : "Satish Kumar"},
-        {username : "Angraj"},
-        {username : "Kaushal Kumar"},
-        {username : "Avinash Kumar"},
-        {username : "Roshan"},
-        {username : "Himanshu"},
-        {username : "Kundan Kumar"},
-        {username : "JayVardhan"},
-        {username : "Ujjawal Kumar"}
-    ]
+    const dispatch = useDispatch();
 
-    const [selectedUser, setSelectedUser] = useState(null);
     const [selectedSection, setSelectedSection] = useState('oneToOne');
     const [searchedItems, setSearchedItems] = useState([]);
 
@@ -42,11 +28,18 @@ function ChatPage(){
             console.log(error);
         }
     }
+
+    const handleSelectedItem = (item) => {
+        dispatch(setSelectedChatType("OneToOne"));
+        dispatch(setSelectedChatData(item));
+        setSearchedItems([]);
+    };
+
     
     return(
         <>
             <div style={{display:'flex'}}>
-                <div style={{height:'95vh', width:'30vw', marginTop:'2vh'}}><b>Chat with connection here : </b>
+                <div style={{height:'95vh', width:'30vw', marginTop:'2vh'}}><b>Chat with connections </b>
                     <div>
                         <input type='search' onChange={(e) => searchItems(e.target.value)} placeholder='Search for Family, Friends and Collegue ...' style={{ margin: '1vh 1vw 1vh 1vw', width: '28vw', borderRadius: '0.5rem', padding: '5px ' }} />
                     </div>
@@ -64,30 +57,26 @@ function ChatPage(){
                     {
                         selectedSection === 'oneToOne'
                         ? 
-                            (
+                            (   //This is for one to one with having search contacts
                                 searchedItems.length > 0
-                                ? searchedItems.map((user) => (
-                                    <div onClick={() => setSelectedUser(user)} key={user.username} style={{ display: 'flex', marginTop: '1vh', marginLeft: '1vw' }}>
+                                ? searchedItems.map((item) => (
+                                    <div onClick={() => handleSelectedItem(item)} key={item.username} style={{ display: 'flex', marginTop: '1vh', marginLeft: '1vw' }}>
                                         <div className='Avatar'><Avatar /></div>
                                         <div style={{paddingLeft: '0.5rem' }}>
-                                            <div><strong>{user.name}</strong></div>
-                                            <div style={{color:'#1f1f1f', fontSize:'12px'}}>@{user.username}</div>
+                                            <div><strong>{item.name}</strong></div>
+                                            <div style={{color:'#1f1f1f', fontSize:'12px'}}>@{item.username}</div>
                                         </div>
                                     </div>
                                 ))
-                                :
-                                suggestedUsers.map((user) => (
-                                    <div onClick={() => setSelectedUser(user)} key={user.username} style={{ display: 'flex', marginTop: '1vh', marginLeft: '1vw' }}>
-                                        <div className='Avatar'><Avatar /></div>
-                                        <div style={{paddingTop:'0.5rem',paddingLeft: '0.5rem' }}>
-                                            <div><strong>{user.username}</strong></div>
-                                        </div>
+                                : 
+                                (   // this is for one to one having no any searched contacts
+                                    <div style={{height:'40vh', width:'80%', display:'flex', justifyContent:'center', alignItems:'center', color:'red', fontWeight:'bolder'}}>
+                                        <div>Search Contacts for Chat</div>
                                     </div>
-                                ))
-
+                                )
                             )
                         : 
-                            (
+                            (   // This is for group
                                 <div>
                                     <div style={{ display: 'flex', marginTop: '1vh', marginLeft: '1vw' }}>
                                         <div className='Avatar'><Avatar /></div>
@@ -102,7 +91,7 @@ function ChatPage(){
                     }
                     </div>
                 </div>
-                <MessagesContainer selectedUser={selectedUser} setSelectedUser={setSelectedUser}/>
+                <MessagesContainer />
             </div>
         </>
     );

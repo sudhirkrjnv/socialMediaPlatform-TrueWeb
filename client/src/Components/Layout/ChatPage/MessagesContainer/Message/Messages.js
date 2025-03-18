@@ -1,5 +1,5 @@
 import './Messages.css';
-function Messages({selectedUser}){
+function Messages({selectedChatData}){
     let messages = [
         {id:"sender", text:"Hi!"},
         {id:"receiver", text:"Hello"},
