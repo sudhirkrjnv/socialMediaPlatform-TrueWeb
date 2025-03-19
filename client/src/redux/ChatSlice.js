@@ -18,7 +18,7 @@ const chatSlice = createSlice({
         },
         
         addMessage: (state, action) => {
-            const { message } = action.payload;
+            const message = action.payload;
             state.selectedChatMessages.push({
                 ...message,
                 recipient: state.selectedChatType === 'group'

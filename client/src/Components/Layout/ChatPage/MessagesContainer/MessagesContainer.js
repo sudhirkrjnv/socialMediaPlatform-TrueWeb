@@ -4,13 +4,16 @@ import EmojiPicker from 'emoji-picker-react';
 import { Avatar, Button } from '@mui/material';
 import { deepOrange} from '@mui/material/colors';
 import Messages from './Message/Messages';
-import { useDispatch, useSelector} from 'react-redux';
+import { useSelector} from 'react-redux';
+
 
 function MessagesContainer() {
 
+    const { user } = useSelector((store) => store.auth);
+    const { socket } = useSelector((store) => store.socket);
     const {selectedChatType, selectedChatData} = useSelector(store=>store.chat);
 
-    const [messageText, setMessageText] = useState('');
+    const [message, setMessage] = useState('');
 
     const emojiPickerRef = useRef();
     const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
@@ -39,8 +42,22 @@ function MessagesContainer() {
     }, [emojiPickerOpen]);
     
     const onEmojiClick = (emoji) => {
-        setMessageText((prevMessageText) => prevMessageText + emoji.emoji);
+        setMessage((prevMessage) => prevMessage + emoji.emoji);
     };
+
+    const handlesendMessage = async()=>{
+        if(selectedChatType==="OneToOne"){
+            socket.emit("sendMessage", {
+                sender: user._id,
+                content: message,
+                recipient: selectedChatData._id,
+                messageType: "text",
+                fileUrl: undefined,
+            })
+
+            setMessage('');
+        }
+    }
 
   return (
     <div>
@@ -66,11 +83,11 @@ function MessagesContainer() {
                         </div>
                         <div style={{display:'flex', alignItems:'center'}}>
                             <div style={{width:'88%', height:'5vh', border:'1px solid pink', marginTop:'1vh', borderRadius:'0.4rem', display:'flex', alignItems:'center', overflow:'hidden'}}>
-                                <input type='text' value={messageText} onChange={(e) => setMessageText(e.target.value.trim() ?  e.target.value : "")}  placeholder='send messages' style={{width:'88%', height:'5vh', fontFamily:"monospace", fontWeight:'bold',fontSize:'15px', outline:'none', border:'none', marginLeft:'10px', backgroundColor:'inherit'}}/>
+                                <input type='text' value={message} onChange={(e) => setMessage(e.target.value.trim() ?  e.target.value : "")}  placeholder='send messages' style={{width:'88%', height:'5vh', fontFamily:"monospace", fontWeight:'bold',fontSize:'15px', outline:'none', border:'none', marginLeft:'10px', backgroundColor:'inherit'}}/>
                                 <Attachment style={{marginTop:'5px', marginRight:'10px', transform:'rotate(135deg)'}}/>
                                 <SentimentSatisfiedAlt  onClick={toggleEmojiPicker} style={{marginTop:'5px', marginRight:'10px'}}/>
                             </div>
-                            <Button disabled={!messageText.trim()}> Send </Button> 
+                            <Button disabled={!message.trim()} onClick={handlesendMessage}> Send </Button> 
                             
                         </div>
                         {

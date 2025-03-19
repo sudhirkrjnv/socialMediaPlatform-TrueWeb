@@ -1,31 +1,57 @@
+import moment from 'moment';
 import './Messages.css';
-function Messages({selectedChatData}){
-    let messages = [
-        {id:"sender", text:"Hi!"},
-        {id:"receiver", text:"Hello"},
-        {id:"sender", text:"Kya haal hai ?"},
-        {id:"receiver", text:"Sb mst  hai"},
-        {id:"sender", text:"Kha ho abhi ?"},
-        {id:"receiver", text:"Home town"},
-        {id:"sender", text:"Kb College Chaloge ?"},
-        {id:"receiver", text:"College Start hone ke first week me"},
-        {id:"sender", text:"Ok"},
-        {id:"sender", text:"👍"}
-        
-    ]
+import {useSelector} from 'react-redux';
+import { useEffect, useRef } from 'react';
+function Messages({}){
+
+    const { selectedChatType, selectedChatData, selectedChatMessages } = useSelector((store) => store.chat);
+
+    const scrollRef = useRef();
+    const messagesContainerRef = useRef();
+
+    let lastdate = null;
+
+    useEffect(()=>{
+        if(scrollRef.current){
+            scrollRef.current.scrollIntoView({behavior:"smooth"});
+        }
+    }, [selectedChatMessages]);
 
     return (
         <>
-        <div className="messagesContainer" style={{height:'100%', width:'100%', overflowY:'scroll', scrollBehavior:'smooth' }}>
+        <div ref={messagesContainerRef} className="messagesContainer" style={{height:'100%', width:'100%', overflowY:'scroll', scrollBehavior:'smooth' }}>
             {
-                messages.map((msg, index)=>{
+                selectedChatMessages.map((msg, index)=>{
+                    const msgDate = moment(msg.timestamp).format("YYYY-MM-DD");
+                    const showDate = msgDate !== lastdate;
+                    lastdate = msgDate;
                     return(
-                        <div key={index} style={{display:'flex', justifyContent: msg.id === "sender" ? 'flex-start' : 'flex-end', color: msg.id === "sender" ? 'blue' : 'green'}}>
-                            <div style={{margin:'0.5rem' , backgroundColor: msg.id === "sender" ? 'lightblue' : 'lightgreen', minHeight:'2rem',maxWidth:'45%', borderRadius:'0.5rem', padding:'0.2rem'}}>{msg.text}</div>
+                        <div key={index}>
+                            { showDate && ( <div style={{textAlign:'center', marginBottom:'10px', fontSize:'12px', color: "#666"}}>{moment(msg.timestamp).format("LL")}</div> ) }
+                            {
+                                selectedChatType === "OneToOne" 
+                                && (
+                                    <div style={{display:'flex', justifyContent: msg.sender === selectedChatData._id ? 'flex-start' : 'flex-end' }}>
+                                        {
+                                            msg.messageType === "text" && (
+                                                <div style={{backgroundColor: msg.sender === selectedChatData._id ? "#FFFFFF" : "#D9FDD3", marginBottom: "8px" , maxWidth: "60%", padding: "10px", borderRadius: "10px", wordBreak: "break-word", boxShadow: "0px 2px 5px rgba(0,0,0,0.1)", position: "relative"}}>
+                                                    <diV style={{fontSize: "14px", lineHeight: "1.5",}}>
+                                                        {msg.content}
+                                                    </diV>
+                                                    <div style={{ fontSize: "10px", color: "#666", textAlign: "right", marginTop: "5px"}}>
+                                                        {moment(msg.timestamp).format("LT")}
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+                                    </div>
+                                )
+                            }
                         </div>
                     )
                 })
             }
+            <div ref={scrollRef} />
         </div>
         </>
     )

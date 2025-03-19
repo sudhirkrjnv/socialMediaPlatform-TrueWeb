@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import userRoute from "./routes/user.route.js";
 import postRoute from "./routes/post.routes.js";
 import cookieParser from "cookie-parser";
+import { setupSocket } from "./socket.js";
 dotenv.config({});
 
 const app = express();
@@ -33,11 +34,10 @@ app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 
 
-
-
-
-app.listen(PORT, ()=>{
+const server = app.listen(PORT, ()=>{
     console.log(`server is listen on port ${PORT}`);
     connectDB();
 })
+setupSocket(server);
+
 

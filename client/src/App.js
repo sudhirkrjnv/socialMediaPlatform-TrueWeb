@@ -6,13 +6,17 @@ import Profile from './Components/Layout/Profile/Profile';
 import ChatPage from './Components/Layout/ChatPage/ChatPage';
 import Signin from './Components/Signin/Signin';
 import Signup from './Components/Signup/Signup';
+import { useEffect} from 'react';
+import { io } from 'socket.io-client';
+import {useSelector, useDispatch} from 'react-redux';
+import { setSocket } from './redux/socketSlice';
+import { addMessage } from './redux/chatSlice';
 
-function App() {
-  const browserRouter = createBrowserRouter([
-    {
-      path:"/",
-      element:<MainLayout/>,
-      children:[
+const browserRouter = createBrowserRouter([
+  {
+    path:"/",
+    element:<MainLayout/>,
+    children:[
         {
           path:"/",
           element:<Home/>
@@ -36,11 +40,56 @@ function App() {
       element:<Signup/>
     }
   ])
+
+  function App() {
+
+  const { user } = useSelector((store) => store.auth);
+  const { socket } = useSelector((store) => store.socket);
+  const { selectedChatType, selectedChatData } = useSelector((store) => store.chat);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    if (user) {
+      const socketio = io('http://localhost:8000', {
+        withCredentials: true,
+        query: { userId: user?._id },
+        transports: ['websocket'],
+      });
+      dispatch(setSocket(socketio));
+
+      socketio.on('connect', () => {
+        console.log('Connected to socket server');
+      });
+      
+      const handleReceiveMessage = (message) => {
+        if (
+          selectedChatType !== undefined &&
+          (selectedChatData._id === message.sender._id ||
+           selectedChatData._id === message.recipient._id)
+        ) {
+          console.log("msg rcv", message);
+          dispatch(addMessage(message));
+        }
+      };
+
+      socketio.on('receiveMessage', handleReceiveMessage);
+
+      return () => {
+          socketio.disconnect();
+          dispatch(setSocket(null));
+      };
+    } else if(socket){
+      socket.disconnect();
+      dispatch(setSocket(null));
+    }
+  }, [user, dispatch, selectedChatType, selectedChatData]);
+
   return (
     <>
       <RouterProvider router={browserRouter}/>
     </>
   );
+
 }
 
 export default App;
