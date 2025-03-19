@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
 import { Message } from './models/message.models.js';
+import { sendMessage } from './controller/message.controller.js';
 
 export const setupSocket = (server) => {
     
@@ -22,23 +23,23 @@ export const setupSocket = (server) => {
             }
         }
     };
-    const sendMessage = async(message) => {
-        const senderSocketId = userSocketMap.get(message.sender);
-        const recipientSocketId = userSocketMap.get(message.recipient);
+    // const sendMessage = async(message) => {
+    //     const senderSocketId = userSocketMap.get(message.sender);
+    //     const recipientSocketId = userSocketMap.get(message.recipient);
 
-        const createdMessage = await Message.create(message);
+    //     const createdMessage = await Message.create(message);
 
-        const messageData = await Message.findById(createdMessage._id)
-            .populate("sender","username name")
-            .populate("recipient","username name");
+    //     const messageData = await Message.findById(createdMessage._id)
+    //         .populate("sender","username name")
+    //         .populate("recipient","username name");
         
-        if(recipientSocketId){
-            io.to(recipientSocketId).emit("receiveMessage", messageData);
-        }
-        if(senderSocketId){
-            io.to(senderSocketId).emit("receiveMessage", messageData);
-        }
-    };
+    //     if(recipientSocketId){
+    //         io.to(recipientSocketId).emit("receiveMessage", messageData);
+    //     }
+    //     if(senderSocketId){
+    //         io.to(senderSocketId).emit("receiveMessage", messageData);
+    //     }
+    // };
 
     io.on('connection', (socket) => {
         const userId = socket.handshake.query.userId;
@@ -49,8 +50,11 @@ export const setupSocket = (server) => {
             console.log('User Id not provided during connection');
         }
 
+        // socket.on("sendMessage", async (message) => {
+        //     await sendMessage(message);
+        // });
         socket.on("sendMessage", async (message) => {
-            await sendMessage(message);
+            await sendMessage(message, io, userSocketMap);
         });
 
         socket.on('disconnect', () => disconnect(socket));

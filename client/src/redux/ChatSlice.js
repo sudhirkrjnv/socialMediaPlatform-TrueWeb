@@ -30,6 +30,27 @@ const chatSlice = createSlice({
             });
         },
 
+        setReceivedMessage: (state, action) => {
+            const message = action.payload;
+            if (
+                state.selectedChatType !== undefined &&
+                (state.selectedChatData._id === message.sender._id ||
+                 state.selectedChatData._id === message.recipient._id)
+            ) {
+                state.selectedChatMessages.push({
+                    ...message,
+                    recipient: state.selectedChatType === 'group'
+                        ? message.recipient
+                        : message.recipient._id,
+                    sender: state.selectedChatType === 'group'
+                        ? message.sender
+                        : message.sender._id,
+                });
+            }
+        },
+
+
+
         closeChat: (state) => {
             state.selectedChatType = undefined;
             state.selectedChatData = undefined;
@@ -39,5 +60,5 @@ const chatSlice = createSlice({
 });
 
 
-export const { setSelectedChatType, setSelectedChatData, addMessage, closeChat } = chatSlice.actions;
+export const { setSelectedChatType, setSelectedChatData, addMessage, setReceivedMessage, closeChat } = chatSlice.actions;
 export default chatSlice.reducer;

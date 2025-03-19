@@ -10,7 +10,7 @@ import { useEffect} from 'react';
 import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
 import { setSocket } from './redux/socketSlice';
-import { addMessage } from './redux/chatSlice';
+import { setReceivedMessage } from './redux/chatSlice';
 
 const browserRouter = createBrowserRouter([
   {
@@ -61,18 +61,9 @@ const browserRouter = createBrowserRouter([
         console.log('Connected to socket server');
       });
       
-      const handleReceiveMessage = (message) => {
-        if (
-          selectedChatType !== undefined &&
-          (selectedChatData._id === message.sender._id ||
-           selectedChatData._id === message.recipient._id)
-        ) {
-          console.log("msg rcv", message);
-          dispatch(addMessage(message));
-        }
-      };
-
-      socketio.on('receiveMessage', handleReceiveMessage);
+      socketio.on('receiveMessage', (message) => {
+        dispatch(setReceivedMessage(message));
+      });
 
       return () => {
           socketio.disconnect();
