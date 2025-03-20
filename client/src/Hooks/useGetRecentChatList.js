@@ -7,7 +7,7 @@ const useGetRecentChatList = () => {
     useEffect(() => {
         const fetchRecentChatList = async () => {
             try {
-                const res = await axios.get('http://localhost:8000/api/v1/message/getListofOneToOneOldUsers', { withCredentials: true });
+                const res = await axios.get('http://localhost:8000/api/v1/message/recentUsersList', { withCredentials: true });
                 if (res.status === 200) {
                     setChatList(res.data.list);
                 }
