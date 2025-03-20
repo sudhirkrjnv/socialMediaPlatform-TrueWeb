@@ -8,15 +8,15 @@ const chatSlice = createSlice({
         selectedChatMessages: [],
     },
     reducers: {
-
         setSelectedChatType: (state, action) => {
             state.selectedChatType = action.payload;
         },
-  
         setSelectedChatData: (state, action) => {
             state.selectedChatData = action.payload;
         },
-        
+        setSelectedChatMessages: (state, action) => {
+            state.selectedChatMessages = action.payload;
+        },
         addMessage: (state, action) => {
             const message = action.payload;
             state.selectedChatMessages.push({
@@ -29,7 +29,6 @@ const chatSlice = createSlice({
                     : message.sender._id,
             });
         },
-
         setReceivedMessage: (state, action) => {
             const message = action.payload;
             if (
@@ -48,9 +47,6 @@ const chatSlice = createSlice({
                 });
             }
         },
-
-
-
         closeChat: (state) => {
             state.selectedChatType = undefined;
             state.selectedChatData = undefined;
@@ -59,6 +55,5 @@ const chatSlice = createSlice({
     },
 });
 
-
-export const { setSelectedChatType, setSelectedChatData, addMessage, setReceivedMessage, closeChat } = chatSlice.actions;
+export const { setSelectedChatType, setSelectedChatData, setSelectedChatMessages, addMessage, setReceivedMessage, closeChat } = chatSlice.actions;
 export default chatSlice.reducer;

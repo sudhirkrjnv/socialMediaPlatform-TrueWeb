@@ -10,7 +10,9 @@ import socketSlice from "./socketSlice.js"
 const persistConfig = {
     key: 'root',
     storage,
-  }
+    //blacklist: ['chat', 'socket'],  // added for checking getmessage api for fetching all messages from server
+};
+
 const rootReducer = combineReducers({
     auth:authSlice,
     post:postSlice,
@@ -18,7 +20,7 @@ const rootReducer = combineReducers({
     socket: socketSlice,
 })
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
     reducer:persistedReducer,

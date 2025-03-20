@@ -2,6 +2,8 @@ import moment from 'moment';
 import './Messages.css';
 import {useSelector} from 'react-redux';
 import { useEffect, useRef } from 'react';
+import useGetAllMessages from '../../../../../Hooks/useGetAllMessages';
+
 function Messages({}){
 
     const { selectedChatType, selectedChatData, selectedChatMessages } = useSelector((store) => store.chat);
@@ -11,11 +13,14 @@ function Messages({}){
 
     let lastdate = null;
 
+    useGetAllMessages();
+
     useEffect(()=>{
         if(scrollRef.current){
             scrollRef.current.scrollIntoView({behavior:"smooth"});
         }
     }, [selectedChatMessages]);
+
 
     return (
         <>

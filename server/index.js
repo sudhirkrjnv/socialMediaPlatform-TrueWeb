@@ -2,8 +2,9 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./utils/db.js";
 import dotenv from "dotenv";
-import userRoute from "./routes/user.route.js";
+import userRoute from "./routes/user.routes.js";
 import postRoute from "./routes/post.routes.js";
+import messageRoute from "./routes/message.routes.js";
 import cookieParser from "cookie-parser";
 import { setupSocket } from "./socket.js";
 dotenv.config({});
@@ -32,6 +33,7 @@ app.use(cors({
 // api
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
+app.use("/api/v1/message", messageRoute);
 
 
 const server = app.listen(PORT, ()=>{
