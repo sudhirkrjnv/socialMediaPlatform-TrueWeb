@@ -31,7 +31,7 @@ function ChatPage() {
             }
         };
         fetchRecentChatList();
-    }, [dispatch]);
+    }, []);
 
     const handleSelectedItem = (item) => {
         dispatch(setSelectedChatType("OneToOne"));
