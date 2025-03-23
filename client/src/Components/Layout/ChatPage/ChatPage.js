@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData, setRecentChatList } from '../../../redux/chatSlice.js';
+import { setSelectedChatType, setSelectedChatData, setRecentChatList, setSelectedChatMessages } from '../../../redux/chatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import {AddCommentOutlined, MoreVertOutlined} from '@mui/icons-material';
@@ -11,13 +11,13 @@ import Dialog from '../../../utils/dialogUtils.js';
 import ContactSearch from './ContactSearch.js';
 
 
-function ChatPage() {
+function ChatPage({isGroup=false}) {
 
     const dispatch = useDispatch();
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [privateChatOpen, setPrivateChatOpen] = useState(false);
 
-    const {recentChatList} = useSelector(store=>store.chat);
+    const {recentChatList, selectedChatData} = useSelector(store=>store.chat);
 
     useEffect(() => {
         const fetchRecentChatList = async () => {
@@ -34,8 +34,15 @@ function ChatPage() {
     }, []);
 
     const handleSelectedItem = (item) => {
-        dispatch(setSelectedChatType("OneToOne"));
-        dispatch(setSelectedChatData(item));
+        if(isGroup){
+            dispatch(setSelectedChatType("Group"));
+        } else {
+            dispatch(setSelectedChatType("OneToOne"));
+            dispatch(setSelectedChatData(item));
+        }
+        if(selectedChatData && selectedChatData._id !== item._id){
+            dispatch(setSelectedChatMessages([]));
+        }
     };
 
     return (
@@ -72,13 +79,34 @@ function ChatPage() {
                             recentChatList?.length > 0
                             ? (
                                 recentChatList.map((chat) => (
-                                    <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer' }}>
-                                        <Avatar src={chat.profilePicture} />
-                                        <div style={{ paddingLeft: '0.5rem' }}>
-                                            <div><strong>{chat.name}</strong></div>
-                                            <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>
-                                            <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div>
-                                        </div>
+                                    <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>
+                                        {
+                                            !isGroup && <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
+                                                <div style={{display:'flex', alignItems:'center'}}>
+                                                    <Avatar src={chat.profilePicture} />
+                                                    <div style={{ paddingLeft: '0.5rem' }}>
+                                                        <div><strong>{chat.name}</strong></div>
+                                                        <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
+                                                </div>
+                                            </div>
+                                        }
+                                        {
+                                            isGroup && <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
+                                                <div style={{display:'flex', alignItems:'center'}}>
+                                                    <Avatar/>
+                                                    <div style={{ paddingLeft: '0.5rem', display:'flex', flexDirection:'column', justifyContent:'center' }}>
+                                                        <div><strong>Group 1</strong></div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
+                                                </div>
+                                            </div>
+                                        }
                                     </div>
                                 ))
                             ) 
