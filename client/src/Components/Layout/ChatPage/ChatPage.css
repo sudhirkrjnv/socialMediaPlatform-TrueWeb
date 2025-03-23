@@ -1,9 +1,6 @@
 .Profiles::-webkit-scrollbar{
     display: none;
 }
-.Profiles{
-    border-right: 1px solid red;
-}
 .Avatar{
     height: 2.5rem;
     width: 2.5rem;
