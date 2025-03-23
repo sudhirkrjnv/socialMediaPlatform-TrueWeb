@@ -9,7 +9,7 @@ import Signup from './Components/Signup/Signup';
 import { useEffect} from 'react';
 import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
-import { setSocket } from './redux/socketSlice';
+import { setSocket, setUserStatus } from './redux/socketSlice';
 import { setReceivedMessage } from './redux/chatSlice';
 
 const browserRouter = createBrowserRouter([
@@ -59,6 +59,10 @@ const browserRouter = createBrowserRouter([
 
       socketio.on('connect', () => {
         console.log('Connected to socket server');
+      });
+
+      socketio.on('userStatus', (data) => {
+        dispatch(setUserStatus(data));
       });
       
       socketio.on('receiveMessage', (message) => {

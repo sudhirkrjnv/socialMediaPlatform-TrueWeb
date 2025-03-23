@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedChatType, setSelectedChatData, setRecentChatList, setSelectedChatMessages } from '../../../redux/chatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
-import {AddCommentOutlined, MoreVertOutlined} from '@mui/icons-material';
+import {AddCommentOutlined, MoreVertOutlined, FiberManualRecord} from '@mui/icons-material';
 import axios from 'axios';
 import MessagesContainer from './MessagesContainer/MessagesContainer';
 import { Popover } from 'react-tiny-popover'
@@ -18,6 +18,7 @@ function ChatPage({isGroup=false}) {
     const [privateChatOpen, setPrivateChatOpen] = useState(false);
 
     const {recentChatList, selectedChatData} = useSelector(store=>store.chat);
+    const { userStatus } = useSelector((store) => store.socket);
 
     useEffect(() => {
         const fetchRecentChatList = async () => {
@@ -89,8 +90,9 @@ function ChatPage({isGroup=false}) {
                                                         <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>
                                                     </div>
                                                 </div>
-                                                <div>
+                                                <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
                                                     <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
+                                                    <FiberManualRecord fontSize='sx' style={{ color: userStatus[chat._id] === 'active' ? 'green' : 'red' }} />
                                                 </div>
                                             </div>
                                         }

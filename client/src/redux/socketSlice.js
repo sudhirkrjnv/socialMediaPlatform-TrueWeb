@@ -4,14 +4,19 @@ const socketSlice = createSlice({
     name:"socket",
     initialState:{
         socket: null,
+        userStatus: {},
     },
     reducers:{
         //actions
         setSocket:(state, action)=>{
             state.socket = action.payload;
-        }
+        },
+        setUserStatus: (state, action) => {
+            const { userId, status } = action.payload;
+            state.userStatus[userId] = status; // Update the status for the specific user
+        },
     }
 })
 
-export const {setSocket} = socketSlice.actions;
+export const {setSocket, setUserStatus} = socketSlice.actions;
 export default socketSlice.reducer;
