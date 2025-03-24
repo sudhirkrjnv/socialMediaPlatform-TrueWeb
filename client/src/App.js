@@ -65,6 +65,10 @@ const browserRouter = createBrowserRouter([
             dispatch(setUserStatus(data));
         });
         
+        socketio.on('messageSent', (message) => {
+          dispatch(setReceivedMessage(message));
+        });
+
         socketio.on('receiveMessage', (message) => {
             dispatch(setReceivedMessage(message));
         });

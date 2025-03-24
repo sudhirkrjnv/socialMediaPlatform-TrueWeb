@@ -40,6 +40,7 @@ export const setupSocket = (server) => {
             const recipientSocketId = userSocketMap.get(message.recipient);
         
             const createdMessage = await Message.create(message);
+            
             const messageData = await Message.findById(createdMessage._id)
                 .populate("sender", "username name profilePicture")
                 .populate("recipient", "username name profilePicture");
