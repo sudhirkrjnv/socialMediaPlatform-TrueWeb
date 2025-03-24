@@ -6,7 +6,7 @@ const chatSlice = createSlice({
         selectedChatType: undefined,
         selectedChatData: undefined,
         selectedChatMessages: [],
-        recentChatList:[],
+        recentChatList: [],
     },
     reducers: {
         setSelectedChatType: (state, action) => {
@@ -51,6 +51,26 @@ const chatSlice = createSlice({
                 });
             }
         },
+        updateRecentChatList: (state, action) => {
+            const { message, currentUserId } = action.payload;
+            
+            const otherUser = message.sender._id === currentUserId 
+                ? message.recipient 
+                : message.sender;
+        
+            state.recentChatList = state.recentChatList.filter(
+                chat => chat._id !== otherUser._id
+            );
+        
+            state.recentChatList.unshift({
+                _id: otherUser._id,
+                username: otherUser.username,
+                name: otherUser.name,
+                profilePicture: otherUser.profilePicture,
+                lastMessageTime: message.timestamp,
+                lastMessage: message.message
+            });
+        },
         closeChat: (state) => {
             state.selectedChatType = undefined;
             state.selectedChatData = undefined;
@@ -59,5 +79,6 @@ const chatSlice = createSlice({
     },
 });
 
-export const { setSelectedChatType, setSelectedChatData, setSelectedChatMessages, addMessage, setReceivedMessage, setRecentChatList, closeChat } = chatSlice.actions;
+export const { setSelectedChatType, setSelectedChatData, setSelectedChatMessages, addMessage, setReceivedMessage, setRecentChatList, updateRecentChatList, closeChat, recentUsersList } = chatSlice.actions;
+
 export default chatSlice.reducer;

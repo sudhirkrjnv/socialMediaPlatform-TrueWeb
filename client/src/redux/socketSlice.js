@@ -13,7 +13,7 @@ const socketSlice = createSlice({
         },
         setUserStatus: (state, action) => {
             const { userId, status } = action.payload;
-            state.userStatus[userId] = status; // Update the status for the specific user
+            state.userStatus[userId] = status;
         },
     }
 })

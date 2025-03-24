@@ -62,7 +62,6 @@ export const recentUsersList = async (req, res) => {
         return res.status(200).json({ success: true, list });
 
     } catch (error) {
-        console.error("Error in getListofOneToOneOldUsers controller:", error);
         return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };

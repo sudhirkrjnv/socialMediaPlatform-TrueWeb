@@ -11,6 +11,7 @@ import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
 import { setSocket, setUserStatus } from './redux/socketSlice';
 import { setReceivedMessage } from './redux/chatSlice';
+import { updateRecentChatList } from './redux/chatSlice'; 
 
 const browserRouter = createBrowserRouter([
   {
@@ -45,39 +46,45 @@ const browserRouter = createBrowserRouter([
 
   const { user } = useSelector((store) => store.auth);
   const { socket } = useSelector((store) => store.socket);
-  const { selectedChatType, selectedChatData } = useSelector((store) => store.chat);
   const dispatch = useDispatch();
   
   useEffect(() => {
     if (user) {
-      const socketio = io('http://localhost:8000', {
-        withCredentials: true,
-        query: { userId: user?._id },
-        transports: ['websocket'],
-      });
-      dispatch(setSocket(socketio));
+        const socketio = io('http://localhost:8000', {
+            withCredentials: true,
+            query: { userId: user?._id },
+            transports: ['websocket'],
+        });
+        dispatch(setSocket(socketio));
 
-      socketio.on('connect', () => {
-        console.log('Connected to socket server');
-      });
+        socketio.on('connect', () => {
+            console.log('Connected to socket server');
+        });
 
-      socketio.on('userStatus', (data) => {
-        dispatch(setUserStatus(data));
-      });
-      
-      socketio.on('receiveMessage', (message) => {
-        dispatch(setReceivedMessage(message));
-      });
+        socketio.on('userStatus', (data) => {
+            dispatch(setUserStatus(data));
+        });
+        
+        socketio.on('receiveMessage', (message) => {
+            dispatch(setReceivedMessage(message));
+        });
 
-      return () => {
-          socketio.disconnect();
-          dispatch(setSocket(null));
-      };
-    } else if(socket){
-      socket.disconnect();
-      dispatch(setSocket(null));
+        socketio.on('updateRecentChat', (message) => {
+            dispatch(updateRecentChatList({
+                message: message,
+                currentUserId: user._id,
+            }));
+        });
+
+        return () => {
+            socketio.disconnect();
+            dispatch(setSocket(null));
+        };
+    } else if(socket) {
+        socket.disconnect();
+        dispatch(setSocket(null));
     }
-  }, [user, dispatch, selectedChatType, selectedChatData]);
+  }, [user, dispatch]);
 
   return (
     <>

@@ -1,38 +1,58 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData, setRecentChatList, setSelectedChatMessages } from '../../../redux/chatSlice.js';
+import { setSelectedChatType, setSelectedChatData, setRecentChatList, setSelectedChatMessages,updateRecentChatList } from '../../../redux/chatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import {AddCommentOutlined, MoreVertOutlined, FiberManualRecord} from '@mui/icons-material';
 import axios from 'axios';
 import MessagesContainer from './MessagesContainer/MessagesContainer';
-import { Popover } from 'react-tiny-popover'
+import { Popover } from 'react-tiny-popover';
 import Dialog from '../../../utils/dialogUtils.js';
 import ContactSearch from './ContactSearch.js';
 
-
 function ChatPage({isGroup=false}) {
-
     const dispatch = useDispatch();
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [privateChatOpen, setPrivateChatOpen] = useState(false);
 
-    const {recentChatList, selectedChatData} = useSelector(store=>store.chat);
+    const {recentChatList, selectedChatData} = useSelector(store => store.chat);
     const { userStatus } = useSelector((store) => store.socket);
+    const { user } = useSelector((store) => store.auth);
+    const { socket } = useSelector((store) => store.socket);
 
     useEffect(() => {
-        const fetchRecentChatList = async () => {
+        const fetchRecentChats = async () => {
             try {
-                const res = await axios.get('http://localhost:8000/api/v1/message/recentUsersList', { withCredentials: true });
-                if (res.status === 200) {
-                    dispatch(setRecentChatList(res.data.list));
-                }
+                const res = await axios.get('http://localhost:8000/api/v1/message/recentUsersList', {
+                    withCredentials: true
+                });
+                dispatch(setRecentChatList(res.data.list));
             } catch (error) {
-                console.log("Error fetching chat list:", error);
+                console.error("Error fetching recent chats:", error);
             }
         };
-        fetchRecentChatList();
-    }, []);
+        
+        fetchRecentChats();
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (!socket || !user) return;
+    
+        const handleUpdateRecentChat = (message) => {
+            dispatch(updateRecentChatList({
+                message,
+                currentUserId: user._id
+            }));
+        };
+    
+        socket.on('receiveMessage', handleUpdateRecentChat);
+        socket.on('sendMessage', handleUpdateRecentChat);
+    
+        return () => {
+            socket.off('receiveMessage', handleUpdateRecentChat);
+            socket.off('sendMessage', handleUpdateRecentChat);
+        };
+    }, [socket, user, dispatch]);
 
     const handleSelectedItem = (item) => {
         if(isGroup){
@@ -56,7 +76,7 @@ function ChatPage({isGroup=false}) {
                             <Popover isOpen={isPopoverOpen} positions={['left']} 
                                 content={
                                     <div style={{padding:'5px',borderRadius:'10px', display:'flex', gap:'10px'}}>
-                                        <button onClick={()=>{setPrivateChatOpen(true)}} style={{cursor:'pointer'}} style={{backgroundColor:'white', padding:"10px", border:'1px solid #ccc', borderRadius:'8px'}}>Private Chat</button>
+                                        <button onClick={()=>{setPrivateChatOpen(true)}} style={{cursor:'pointer', backgroundColor:'white', padding:"10px", border:'1px solid #ccc', borderRadius:'8px'}}>Private Chat</button>
                                         <button style={{backgroundColor:'white', padding:"10px", border:'1px solid #ccc', borderRadius:'8px'}}>Group Chat</button>
                                     </div>
                                 }>
@@ -76,7 +96,6 @@ function ChatPage({isGroup=false}) {
                     <div className='Profiles' style={{ overflowY: 'scroll', scrollBehavior: 'smooth', height: '86vh', width: '28vw' }}>
                         <h4 style={{ marginLeft: '1vw', marginTop: '2vh' }}>Recent Chats</h4>
                         {
-                           
                             recentChatList?.length > 0
                             ? (
                                 recentChatList.map((chat) => (

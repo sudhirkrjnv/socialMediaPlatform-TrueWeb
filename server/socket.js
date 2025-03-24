@@ -35,22 +35,22 @@ export const setupSocket = (server) => {
             console.log('User Id not provided during connection');
         }
         
-        //sending message
         socket.on("sendMessage", async (message) => {
             const senderSocketId = userSocketMap.get(message.sender);
             const recipientSocketId = userSocketMap.get(message.recipient);
         
             const createdMessage = await Message.create(message);
-        
             const messageData = await Message.findById(createdMessage._id)
-                .populate("sender", "username name")
-                .populate("recipient", "username name");
+                .populate("sender", "username name profilePicture")
+                .populate("recipient", "username name profilePicture");
         
             if (recipientSocketId) {
                 io.to(recipientSocketId).emit("receiveMessage", messageData);
+                io.to(recipientSocketId).emit("updateRecentChat", messageData);
             }
             if (senderSocketId) {
-                io.to(senderSocketId).emit("receiveMessage", messageData);
+                io.to(senderSocketId).emit("messageSent", messageData);
+                io.to(senderSocketId).emit("updateRecentChat", messageData);
             }
         });
 
