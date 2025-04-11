@@ -8,8 +8,8 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setPosts } from '../../../../redux/postSlice';
-import Dialog from '../../../../utils/dialogUtils.js';
-import CommentDialog from './CommentDialog.js';
+import Dialog from '../../../../utils/dialogUtils.jsx';
+import CommentDialog from './CommentDialog.jsx';
 import { setSelectedPost } from '../../../../redux/postSlice';
 
 function Post({post}) {
@@ -158,7 +158,7 @@ function Post({post}) {
                         </Dialog>
                     </div>
                     {/*      Captions     */}
-                    <div style={{padding:'10px' ,paddingLeft:'1rem', cursor:'pointer', display:'block',fontFamily:'Segoe UI', lineHeight:'1.2rem', wordSpacing:'0.4rem', width:'95%', display:'flex', alignItems:'center'}}>{post?.caption || ""}</div>
+                    <div style={{padding:'10px' ,paddingLeft:'1rem', cursor:'pointer', fontFamily:'Segoe UI', lineHeight:'1.2rem', wordSpacing:'0.4rem', width:'95%', display:'flex', alignItems:'center'}}>{post?.caption || ""}</div>
                     {/*     Post Image    */}
                     <div style={{margin:'auto', width:'98%', height:'50vh', border:'1px solid #666', borderRadius:'1rem', backgroundColor:'#eee', overflow:'hidden'}}>
                         <img src={post?.image} style={{width: '100%', height: '100%', objectFit: 'cover'}} />

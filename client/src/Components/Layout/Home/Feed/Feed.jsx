@@ -2,7 +2,7 @@ import Avatar from '@mui/material/Avatar';
 import { deepOrange, blue} from '@mui/material/colors';
 import {Folder, PhotoCamera, Place} from '@mui/icons-material';
 import { useRef, useState } from 'react';
-import Dialog from '../../../../utils/dialogUtils';
+import Dialog from '../../../../utils/dialogUtils.jsx';
 import axios from 'axios';
 import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
@@ -10,7 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import useGetAllPost from '../../../../Hooks/useGetAllPosts';
 import { useSelector, useDispatch } from 'react-redux';
 import { setPosts } from '../../../../redux/postSlice';
-import Post from './Post.js';
+import Post from './Post.jsx';
 
 
 function Feed(){

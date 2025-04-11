@@ -3,7 +3,7 @@ import {Attachment, SentimentSatisfiedAlt} from '@mui/icons-material';
 import EmojiPicker from 'emoji-picker-react';
 import { Avatar, Button } from '@mui/material';
 import { deepOrange} from '@mui/material/colors';
-import Messages from './Message/Messages';
+import Messages from './Message/Messages.jsx';
 import { useSelector} from 'react-redux';
 
 

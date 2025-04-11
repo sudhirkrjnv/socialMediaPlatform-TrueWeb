@@ -1,5 +1,5 @@
-import Feed from "./Feed/Feed";
-import RightSidebar from "./RightSidebar/RightSidebar";
+import Feed from "./Feed/Feed.jsx";
+import RightSidebar from "./RightSidebar/RightSidebar.jsx";
 
 function Home(){
     return(

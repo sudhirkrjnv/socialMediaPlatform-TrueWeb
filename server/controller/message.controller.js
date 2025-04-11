@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { Message } from '../models/message.models.js';
 import { User } from '../models/user.model.js';
+import { Group } from '../models/group.model.js';
 
 export const getMessage = async (req, res) => {
     try {
@@ -66,7 +67,40 @@ export const recentUsersList = async (req, res) => {
     }
 };
 
+export const CreateGroup = async (req, res) => {
+    try {
+        const { name, members } = req.body;
+        const userId = req.id;
 
+        const admin = await User.findById(userId);
+        if (!admin) {
+            return res.status(404).send("Admin not exists");
+        }
+        
+        const validMembers = await User.find({_id:{$in:members}});
 
+        if (validMembers.length !== members.length) {
+            return res.status(400).send("Some are not valid users");
+        }
 
+        const newGroup = new Group({
+            name,
+            members,
+            admin: userId
+        });
+        await newGroup.save()
+            
+        return res.status(201).json({
+            success: true,
+            message: "Group created successfully",
+            group: newGroup
+        });
+            
 
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error during group creation",
+        });
+    }
+};

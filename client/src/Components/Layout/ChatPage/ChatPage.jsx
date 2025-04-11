@@ -5,15 +5,17 @@ import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import {AddCommentOutlined, MoreVertOutlined, FiberManualRecord} from '@mui/icons-material';
 import axios from 'axios';
-import MessagesContainer from './MessagesContainer/MessagesContainer';
+import MessagesContainer from './MessagesContainer/MessagesContainer.jsx';
 import { Popover } from 'react-tiny-popover';
-import Dialog from '../../../utils/dialogUtils.js';
-import ContactSearch from './ContactSearch.js';
+import Dialog from '../../../utils/dialogUtils.jsx';
+import ContactSearch from './ContactSearch.jsx';
+import CreateGroup from './CreateGroup.jsx';
 
 function ChatPage({isGroup=false}) {
     const dispatch = useDispatch();
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [privateChatOpen, setPrivateChatOpen] = useState(false);
+    const [groupChatOpen, setGroupChatOpen] = useState(false);
 
     const {recentChatList, selectedChatData} = useSelector(store => store.chat);
     const { userStatus } = useSelector((store) => store.socket);
@@ -77,7 +79,7 @@ function ChatPage({isGroup=false}) {
                                 content={
                                     <div style={{padding:'5px',borderRadius:'10px', display:'flex', gap:'10px'}}>
                                         <button onClick={()=>{setPrivateChatOpen(true)}} style={{cursor:'pointer', backgroundColor:'white', padding:"10px", border:'1px solid #ccc', borderRadius:'8px'}}>Private Chat</button>
-                                        <button style={{backgroundColor:'white', padding:"10px", border:'1px solid #ccc', borderRadius:'8px'}}>Group Chat</button>
+                                        <button onClick={()=>{setGroupChatOpen(true)}} style={{backgroundColor:'white', padding:"10px", border:'1px solid #ccc', borderRadius:'8px'}}>Group Chat</button>
                                     </div>
                                 }>
                                 <div onClick={() => setIsPopoverOpen(!isPopoverOpen)}>
@@ -87,6 +89,9 @@ function ChatPage({isGroup=false}) {
                             <MoreVertOutlined/>
                             <Dialog open={privateChatOpen} onClose={() => setPrivateChatOpen(false)} overlayStyles={{display:'flex', justifyContent:'center'}} dialogStyles={{padding: '1rem', top:'20vh', width:'25vw', height:'35vh' }}>
                                 <ContactSearch onClose={() => setPrivateChatOpen(false)} />
+                            </Dialog>
+                            <Dialog open={groupChatOpen} onClose={() => setGroupChatOpen(false)} overlayStyles={{display:'flex', justifyContent:'center'}} dialogStyles={{padding: '1rem', top:'20vh', width:'25vw', height:'35vh' }}>
+                                <CreateGroup onClose={() => setGroupChatOpen(false)} />
                             </Dialog>
                         </div>
                     </div>

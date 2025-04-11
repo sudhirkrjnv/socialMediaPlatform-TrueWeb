@@ -208,3 +208,22 @@ export const getfollowers = async (req, res) => {
         console.log(error);
     }
 };
+
+export const getAllMembers = async (req, res) => {
+    try {
+        const users = await User.find({ _id: { $ne: req.id } }, "name username email");
+
+        const members = users.map((user) => ({
+            label: user.name || user.email,
+            value: user._id,
+            name: user.name,
+            email: user.email,
+            username: user.username
+        }));
+        
+        return res.status(200).json({ members });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};

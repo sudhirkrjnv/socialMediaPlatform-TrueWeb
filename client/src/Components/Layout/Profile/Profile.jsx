@@ -3,8 +3,8 @@ import coverPhoto from "./cover.jpg"
 import { useRef, useState } from 'react';
 import {useSelector} from 'react-redux';
 import { Avatar } from '@mui/material';
-import Dialog from '../../../utils/dialogUtils';
-import EditProfile from './EditProfile';
+import Dialog from '../../../utils/dialogUtils.jsx';
+import EditProfile from './EditProfile.jsx';
 import moment from 'moment';
 
 function Profile(){
@@ -76,7 +76,7 @@ function Profile(){
                                 <button style={{position:'absolute', borderRadius:'5px', bottom:'5vh'}} onClick={()=>profilePicRef.current.click()}>Change Cover Picture</button>
                         </div>
                         {/* Profile Picture */}
-                        <div style={{height:'10vw', position:'absolute', bottom:'4vh', left:'0.5vw' ,borderRadius: '50%', border:'0.5px solid black', width:'10vw', borderRadius:'20vh',overflow:'hidden'}}>
+                        <div style={{height:'10vw', position:'absolute', bottom:'4vh', left:'0.5vw' ,border:'0.5px solid black', width:'10vw', borderRadius:'20vh',overflow:'hidden'}}>
                             {
                                 (user?.profilePicture) ? 
                                     <img src={user?.profilePicture} alt="Profile Pic" style={{ height: '100%', width: '100%', objectFit: 'cover', borderRadius:'1rem' }}/> :
