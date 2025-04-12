@@ -32,7 +32,7 @@ function CreateGroup() {
             const res = await axios.post('http://localhost:8000/api/v1/message/createGroup',
               {
                 name: groupName, 
-                members: selectedMembers.map((member)=>member)
+                members: selectedMembers.map((member)=>member.value)
               },
               {withCredentials:true}
             )
@@ -62,7 +62,7 @@ function CreateGroup() {
         {/* Selecting members */}
         <span style={{fontFamily:'cursive'}}>Select Members : </span>
         <div style={{borderRadius:'10px', marginTop:'5px', marginBottom:'10px', display:'flex', justifyContent:'center'}}>
-          <MultiSelect value={selectedMembers} onChange={(e) => setSelectedMembers(e.value)} options={allMembers} optionLabel="label" 
+          <MultiSelect value={selectedMembers.map(m => m.value)} onChange={(e) => setSelectedMembers(allMembers.filter(m => e.value.includes(m.value)))} options={allMembers} optionLabel="label"
             filter placeholder="Search Members" maxSelectedLabels={10} className="w-full md:w-20rem" style={{border:'1px solid #ccc'}}
           />
         </div>
