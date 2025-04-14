@@ -13,6 +13,6 @@ router.route('/profile/editProfile').post(isAuthenticated, upload.fields([{name:
 router.route('/followers').post(isAuthenticated, getfollowers);
 router.route('/allMembers').get(isAuthenticated, getAllMembers);
 
-router.route('/recentgroups').get(isAuthenticated, getUserGroups);
+router.route('/groups').get(isAuthenticated, getUserGroups);
 
 export default router;

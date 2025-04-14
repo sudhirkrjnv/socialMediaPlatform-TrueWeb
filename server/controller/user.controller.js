@@ -242,7 +242,6 @@ export const getUserGroups = async (req, res) => {
         })
         .sort({ createdAt: -1 })
         
-        
         return res.status(200).json({ groups });
 
     } catch (error) {

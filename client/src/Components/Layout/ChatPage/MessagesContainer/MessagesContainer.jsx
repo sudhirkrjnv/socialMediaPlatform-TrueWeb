@@ -1,7 +1,7 @@
 import { useRef, useState , useEffect} from 'react';
 import {Attachment, SentimentSatisfiedAlt} from '@mui/icons-material';
 import EmojiPicker from 'emoji-picker-react';
-import { Avatar, Button } from '@mui/material';
+import { Avatar, Button , Typography} from '@mui/material';
 import { deepOrange} from '@mui/material/colors';
 import Messages from './Message/Messages.jsx';
 import { useSelector} from 'react-redux';
@@ -57,7 +57,7 @@ function MessagesContainer() {
             setMessage('');
         } else if(selectedChatType === "Group"){
             socket.emit("send_Group_Message", {
-                sender: userInfo.id,
+                sender: user._id,
                 content: message,
                 messageType: "text",
                 fileUrl: undefined,
@@ -66,7 +66,7 @@ function MessagesContainer() {
             setMessage('');
         }
     }
-
+    
   return (
     <div>
         <div style={{border:'1px solid black', height:'95vh', width:'45vw', marginTop:'2vh'}}>
@@ -81,14 +81,41 @@ function MessagesContainer() {
             : 
                 (
                     <div style={{ marginTop:'1vh', marginLeft:'1vw', height:'100%', width:'100%', overflow:'hidden'}} >
-                        <div style={{display:'flex',flexDirection:'column', justifyContent:'center', alignItems:'center', width:'100%', height:'20%', marginBottom:'5vh'}}>
-                            <div className='Avatar'><Avatar src={selectedChatData?.profilePicture} sx={{width:40, height:40, bgcolor:deepOrange[400]}} /></div>
-                            <div style={{paddingTop:'0.5rem', paddingLeft:'0.5rem'}}><b>{selectedChatData?.name}</b></div>
-                            <div style={{paddingLeft:'0.5rem', color:'#1f1f1f', fontSize:'12px'}}>@{selectedChatData?.username}</div>
-                        </div>
+                        
+                        {/*  chat headers for Individual and groups */}
+                        {
+                            selectedChatType === "OneToOne" && 
+                            <div style={{display:'flex',flexDirection:'column', justifyContent:'center', alignItems:'center', width:'100%', height:'20%', marginBottom:'5vh'}}>
+                                <Avatar 
+                                    src={selectedChatData?.profilePicture} 
+                                    sx={{ width: 56, height: 56, bgcolor: deepOrange[400] }} 
+                                />
+                                <Typography variant="h6" sx={{ mt: 1 }}>
+                                    {selectedChatData?.name}
+                                </Typography>
+                                <Typography variant="subtitle2" color="text.secondary">
+                                    @{selectedChatData?.username}
+                                </Typography>
+                            </div>
+                        }
+                        {
+                           selectedChatType === "Group" &&
+                           <div style={{display:'flex',flexDirection:'column', justifyContent:'center', alignItems:'center', width:'100%', height:'20%', marginBottom:'5vh'}}>
+                                <Avatar sx={{ width: 56, height: 56, bgcolor: deepOrange[400] }}>
+                                    {selectedChatData?.name.charAt(0)}
+                                </Avatar>
+                                <Typography variant="h6" sx={{ mt: 1 }}>
+                                    {selectedChatData?.name}
+                                </Typography>
+                           </div> 
+                        }
+
+                        {/* messages displaying */}
                         <div style={{width:'95%', height:'65%'}}>
                             <Messages selectedChatData = {selectedChatData}/>
                         </div>
+
+                        {/* messages sending box and its contents */}
                         <div style={{display:'flex', alignItems:'center'}}>
                             <div style={{width:'88%', height:'5vh', border:'1px solid pink', marginTop:'1vh', borderRadius:'0.4rem', display:'flex', alignItems:'center', overflow:'hidden'}}>
                                 <input type='text' value={message} onChange={(e) => setMessage(e.target.value.trim() ?  e.target.value : "")}  placeholder='send messages' style={{width:'88%', height:'5vh', fontFamily:"monospace", fontWeight:'bold',fontSize:'15px', outline:'none', border:'none', marginLeft:'10px', backgroundColor:'inherit'}}/>

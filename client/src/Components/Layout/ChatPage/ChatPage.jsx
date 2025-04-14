@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData, setRecentChatList, setSelectedChatMessages,updateRecentChatList } from '../../../redux/chatSlice.js';
+import { setSelectedChatType, setSelectedChatData, setRecentChatList, setSelectedChatMessages,updateRecentChatList, setGroups } from '../../../redux/chatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
-import {AddCommentOutlined, MoreVertOutlined, FiberManualRecord} from '@mui/icons-material';
+import {AddCommentOutlined, MoreVertOutlined, FiberManualRecord, Group} from '@mui/icons-material';
 import axios from 'axios';
 import MessagesContainer from './MessagesContainer/MessagesContainer.jsx';
 import { Popover } from 'react-tiny-popover';
@@ -11,13 +11,12 @@ import Dialog from '../../../utils/dialogUtils.jsx';
 import ContactSearch from './ContactSearch.jsx';
 import CreateGroup from './CreateGroup.jsx';
 
-function ChatPage({isGroup=false}) {
+function ChatPage() {
     const dispatch = useDispatch();
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [privateChatOpen, setPrivateChatOpen] = useState(false);
     const [groupChatOpen, setGroupChatOpen] = useState(false);
-
-    const {recentChatList, selectedChatData} = useSelector(store => store.chat);
+    const {recentChatList, selectedChatData, groups} = useSelector(store => store.chat);
     const { userStatus } = useSelector((store) => store.socket);
     const { user } = useSelector((store) => store.auth);
     const { socket } = useSelector((store) => store.socket);
@@ -36,6 +35,21 @@ function ChatPage({isGroup=false}) {
         
         fetchRecentChats();
     }, [dispatch]);
+
+    useEffect(() => {
+        const fetchgroups = async () => {
+            try {
+                const res = await axios.get('http://localhost:8000/api/v1/user/groups', {
+                    withCredentials: true
+                });
+                dispatch(setGroups(res.data.groups));
+            } catch (error) {
+                console.error("Error fetching recent chats:", error);
+            }
+        }; 
+        fetchgroups();
+    }, [dispatch]);
+
 
     useEffect(() => {
         if (!socket || !user) return;
@@ -57,12 +71,17 @@ function ChatPage({isGroup=false}) {
     }, [socket, user, dispatch]);
 
     const handleSelectedItem = (item) => {
-        if(isGroup){
+
+        const isGroupChat = groups.some(group => group._id === item._id);
+        
+        if(isGroupChat){
             dispatch(setSelectedChatType("Group"));
         } else {
             dispatch(setSelectedChatType("OneToOne"));
-            dispatch(setSelectedChatData(item));
         }
+        
+        dispatch(setSelectedChatData(item));
+        
         if(selectedChatData && selectedChatData._id !== item._id){
             dispatch(setSelectedChatMessages([]));
         }
@@ -106,7 +125,7 @@ function ChatPage({isGroup=false}) {
                                 recentChatList.map((chat) => (
                                     <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>
                                         {
-                                            !isGroup && <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
+                                            <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
                                                 <div style={{display:'flex', alignItems:'center'}}>
                                                     <Avatar src={chat.profilePicture} />
                                                     <div style={{ paddingLeft: '0.5rem' }}>
@@ -120,19 +139,6 @@ function ChatPage({isGroup=false}) {
                                                 </div>
                                             </div>
                                         }
-                                        {
-                                            isGroup && <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
-                                                <div style={{display:'flex', alignItems:'center'}}>
-                                                    <Avatar/>
-                                                    <div style={{ paddingLeft: '0.5rem', display:'flex', flexDirection:'column', justifyContent:'center' }}>
-                                                        <div><strong>Group 1</strong></div>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
-                                                </div>
-                                            </div>
-                                        }
                                     </div>
                                 ))
                             ) 
@@ -141,6 +147,24 @@ function ChatPage({isGroup=false}) {
                                     <div>Recents Chat is Empty</div>
                                 </div>
                             )   
+                        }
+                        {   
+                            groups?.length > 0 &&
+                            groups.map((chat) => (
+                                <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>
+                                    <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
+                                        <div style={{display:'flex', alignItems:'center'}}>
+                                            <Avatar alt={chat.name} src="/broken-image.jpg" sx={{width:40, height:40}}><Group/></Avatar>
+                                            <div style={{ paddingLeft: '0.5rem', display:'flex', flexDirection:'column', justifyContent:'center' }}>
+                                                <div>{chat.name}</div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
                         }
                     </div>
                 </div>

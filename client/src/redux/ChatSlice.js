@@ -32,10 +32,10 @@ const chatSlice = createSlice({
             const message = action.payload;
             state.selectedChatMessages.push({
                 ...message,
-                recipient: state.selectedChatType === 'group'
+                recipient: state.selectedChatType === 'Group'
                     ? message.recipient
                     : message.recipient._id,
-                sender: state.selectedChatType === 'group'
+                sender: state.selectedChatType === 'Group'
                     ? message.sender
                     : message.sender._id,
             });
@@ -49,10 +49,10 @@ const chatSlice = createSlice({
             ) {
                 state.selectedChatMessages.push({
                     ...message,
-                    recipient: state.selectedChatType === 'group'
+                    recipient: state.selectedChatType === 'Group'
                         ? message.recipient
                         : message.recipient._id,
-                    sender: state.selectedChatType === 'group'
+                    sender: state.selectedChatType === 'Group'
                         ? message.sender
                         : message.sender._id,
                 });
@@ -86,6 +86,18 @@ const chatSlice = createSlice({
     },
 });
 
-export const { setSelectedChatType, setSelectedChatData, setSelectedChatMessages,setGroups, addGroups, addMessage, setReceivedMessage, setRecentChatList, updateRecentChatList, closeChat, recentUsersList } = chatSlice.actions;
+export const { 
+    setSelectedChatType, 
+    setGroups, 
+    addGroups, 
+    setRecentChatList, 
+    updateRecentChatList, 
+    setSelectedChatData, 
+    setSelectedChatMessages,
+    addMessage, 
+    setReceivedMessage, 
+    closeChat, 
+    recentUsersList 
+} = chatSlice.actions;
 
 export default chatSlice.reducer;

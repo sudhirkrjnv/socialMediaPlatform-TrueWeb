@@ -49,11 +49,11 @@ const browserRouter = createBrowserRouter([
   const dispatch = useDispatch();
   const { selectedChatType, selectedChatData} = useSelector(store => store.chat);
 
-  // const handle_Receive_Message = (message)=>{
-  //   if(selectedChatType!==undefined && selectedChatData._id === message.groupId){
-  //     dispatch(addMessage(message));
-  //   }
-  // }
+  const handle_Receive_Message = (message)=>{
+    if(selectedChatType!==undefined && selectedChatData._id === message.groupId){
+      dispatch(addMessage(message));
+    }
+  }
   
   useEffect(() => {
     if (user) {
@@ -79,7 +79,7 @@ const browserRouter = createBrowserRouter([
         socketio.on('receiveMessage', (message) => {
             dispatch(setReceivedMessage(message));
         });
-        //socketio.on('receive_Group_Message', handle_Receive_Message);
+        socketio.on('receive_Group_Message', handle_Receive_Message);
 
         socketio.on('updateRecentChat', (message) => {
             dispatch(updateRecentChatList({
