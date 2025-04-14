@@ -86,6 +86,6 @@ const chatSlice = createSlice({
     },
 });
 
-export const { setSelectedChatType, setSelectedChatData, setSelectedChatMessages, addMessage, setReceivedMessage, setRecentChatList, updateRecentChatList, closeChat, recentUsersList } = chatSlice.actions;
+export const { setSelectedChatType, setSelectedChatData, setSelectedChatMessages,setGroups, addGroups, addMessage, setReceivedMessage, setRecentChatList, updateRecentChatList, closeChat, recentUsersList } = chatSlice.actions;
 
 export default chatSlice.reducer;
