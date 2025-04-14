@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
 import { Message } from './models/message.models.js';
+import {Group} from './models/group.model.js'
 
 
 export const setupSocket = (server) => {
@@ -54,6 +55,44 @@ export const setupSocket = (server) => {
                 io.to(senderSocketId).emit("updateRecentChat", messageData);
             }
         });
+        // socket.on("send_Group_Message", async (message) => {
+
+        //     const {groupId, sender, content, messageType, fileUrl } = message;
+        
+        //     const createdMessage = await Message.create({
+        //         sender, 
+        //         recipient: null,
+        //         content,
+        //         messageType,
+        //         fileUrl,
+        //         timestamp: new Date(),
+        //     });
+            
+        //     const messageData = await Message.findById(createdMessage._id)
+        //         .populate("sender", "username name profilePicture")
+        //         .exec();
+
+        //     await Group.findByIdAndUpdate(groupId, {
+        //         $push: {messages: createdMessage._id},
+        //     })
+        //     const group =  await Group.findById(groupId).populate("members");
+
+        //     const finalData = {...messageData._doc, groupId:group._id};
+
+        //     if(group && group.members){
+        //         group.members.forEach((member)=>{
+        //             const memberSocketId = userSocketMap.get(member._id.toString());
+        //             if(memberSocketId){
+        //                 io.to(memberSocketId).emit("receive_Group_Message", finalData);
+        //             }
+        //         })
+
+        //         const adminSocketId = userSocketMap.get(group.admin._id.toString());
+        //         if(adminSocketId){
+        //             io.to(adminSocketId).emit("receive_Group_Message", finalData)
+        //         }
+        //     }
+        // });
 
         socket.on('disconnect', () => disconnect(socket));
     });

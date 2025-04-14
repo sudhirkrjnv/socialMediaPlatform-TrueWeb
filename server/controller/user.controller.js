@@ -1,8 +1,10 @@
 import {User} from "../models/user.model.js"
+import { Group } from "../models/group.model.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import getDataUri from "../utils/getDaraUri.js"
 import cloudinary from "../utils/cloudinary.js"
+import mongoose from "mongoose"
 
 export const register = async(req, res)=>{
     try {
@@ -224,6 +226,26 @@ export const getAllMembers = async (req, res) => {
         return res.status(200).json({ members });
 
     } catch (error) {
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
+        return res.status(500).json({ success: false, message: "fails to load members" });
+    }
+};
+export const getUserGroups = async (req, res) => {
+    try {
+        
+        const userId = req.id;
+
+        const groups = await Group.find({
+            $or: [
+                { admin: userId },
+                { members: userId }
+            ]
+        })
+        .sort({ createdAt: -1 })
+        
+        
+        return res.status(200).json({ groups });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "fails to load user groups" });
     }
 };

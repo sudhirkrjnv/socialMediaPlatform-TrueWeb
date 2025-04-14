@@ -10,7 +10,7 @@ import { useEffect} from 'react';
 import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
 import { setSocket, setUserStatus } from './redux/socketSlice';
-import { setReceivedMessage } from './redux/chatSlice';
+import { addMessage, setReceivedMessage } from './redux/chatSlice';
 import { updateRecentChatList } from './redux/chatSlice'; 
 
 const browserRouter = createBrowserRouter([
@@ -47,6 +47,13 @@ const browserRouter = createBrowserRouter([
   const { user } = useSelector((store) => store.auth);
   const { socket } = useSelector((store) => store.socket);
   const dispatch = useDispatch();
+  const { selectedChatType, selectedChatData} = useSelector(store => store.chat);
+
+  // const handle_Receive_Message = (message)=>{
+  //   if(selectedChatType!==undefined && selectedChatData._id === message.groupId){
+  //     dispatch(addMessage(message));
+  //   }
+  // }
   
   useEffect(() => {
     if (user) {
@@ -72,6 +79,7 @@ const browserRouter = createBrowserRouter([
         socketio.on('receiveMessage', (message) => {
             dispatch(setReceivedMessage(message));
         });
+        //socketio.on('receive_Group_Message', handle_Receive_Message);
 
         socketio.on('updateRecentChat', (message) => {
             dispatch(updateRecentChatList({

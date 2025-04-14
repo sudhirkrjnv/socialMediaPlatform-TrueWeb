@@ -7,6 +7,7 @@ const chatSlice = createSlice({
         selectedChatData: undefined,
         selectedChatMessages: [],
         recentChatList: [],
+        groups: [],
     },
     reducers: {
         setSelectedChatType: (state, action) => {
@@ -18,8 +19,14 @@ const chatSlice = createSlice({
         setSelectedChatMessages: (state, action) => {
             state.selectedChatMessages = action.payload;
         },
+        setGroups: (state, action) => {
+            state.groups = action.payload;
+        },
         setRecentChatList: (state, action) => {
             state.recentChatList = action.payload;
+        },
+        addGroups: (state, action) => {
+            state.groups = [...action.payload, ...state.groups];
         },
         addMessage: (state, action) => {
             const message = action.payload;

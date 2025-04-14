@@ -1,33 +1,36 @@
 import React, { useEffect , useState} from 'react'
 import axios from 'axios';
 import { MultiSelect } from 'primereact/multiselect';
+import { useDispatch } from 'react-redux';
+import { addGroups } from '../../../redux/chatSlice.js';
 
-
-function CreateGroup() {
+function CreateGroup({onClose}) {
 
       const [allMembers, setAllMembers] = useState([]);
       const [selectedMembers, setSelectedMembers] = useState([]);
       const [groupName, setGroupName] = useState("");
 
+      const dispatch = useDispatch();
+      
       useEffect(()=>{
         const getMembers = async ()=>{
           const res = await axios.get('http://localhost:8000/api/v1/user/allMembers', { withCredentials: true });
-            if (res.status === 200 && res.data.members) {
-              setAllMembers(res.data.members);
-            }
+          if (res.status === 200 && res.data.members) {
+            setAllMembers(res.data.members);
+          }
         };
         getMembers();
       },[])
-
+      
       const creategroup = async()=>{
         try {
-
-          console.log({
-            name: groupName, 
-            allMembers,
-            selectedMembers,
-            members: selectedMembers.map((member)=>member)
-          })
+          
+          // console.log({
+          //   name: groupName, 
+          //   allMembers,
+          //   selectedMembers,
+          //   members: selectedMembers.map((member)=>member)
+          // })
           if(groupName.length >= 0 && selectedMembers.length > 0){
             const res = await axios.post('http://localhost:8000/api/v1/message/createGroup',
               {
@@ -39,6 +42,8 @@ function CreateGroup() {
             if(res.status === 201){
               setGroupName("");
               setSelectedMembers([]);
+              onClose();
+              dispatch(addGroups(res.data.groups));
             }
           }
           
