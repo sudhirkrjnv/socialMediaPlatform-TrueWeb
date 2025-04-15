@@ -53,8 +53,7 @@ function MessagesContainer() {
                 recipient: selectedChatData._id,
                 messageType: "text",
                 fileUrl: undefined,
-            })
-            setMessage('');
+            });
         } else if(selectedChatType === "Group"){
             socket.emit("send_Group_Message", {
                 sender: user._id,
@@ -63,8 +62,8 @@ function MessagesContainer() {
                 fileUrl: undefined,
                 groupId : selectedChatData._id,
             })
-            setMessage('');
         }
+        setMessage("");
     }
     
   return (

@@ -30,16 +30,25 @@ const chatSlice = createSlice({
         },
         addMessage: (state, action) => {
             const message = action.payload;
-            state.selectedChatMessages.push({
-                ...message,
-                recipient: state.selectedChatType === 'Group'
-                    ? message.recipient
-                    : message.recipient._id,
-                sender: state.selectedChatType === 'Group'
-                    ? message.sender
-                    : message.sender._id,
-            });
+        
+            const isGroup = state.selectedChatType === 'Group';
+            const isGroupMatched = isGroup && state.selectedChatData?._id === message.groupId;
+        
+            const isOneToOne = state.selectedChatType === 'OneToOne';
+            const isOneToOneMatched =
+                isOneToOne &&
+                (state.selectedChatData?._id === message.sender._id ||
+                 state.selectedChatData?._id === message.recipient._id);
+        
+            if (isGroupMatched || isOneToOneMatched) {
+                state.selectedChatMessages.push({
+                    ...message,
+                    recipient: isGroup ? message.recipient : message.recipient._id,
+                    sender: isGroup ? message.sender : message.sender._id,
+                });
+            }
         },
+        
         setReceivedMessage: (state, action) => {
             const message = action.payload;
             if (
@@ -47,17 +56,11 @@ const chatSlice = createSlice({
                 (state.selectedChatData._id === message.sender._id ||
                  state.selectedChatData._id === message.recipient._id)
             ) {
-                state.selectedChatMessages.push({
-                    ...message,
-                    recipient: state.selectedChatType === 'Group'
-                        ? message.recipient
-                        : message.recipient._id,
-                    sender: state.selectedChatType === 'Group'
-                        ? message.sender
-                        : message.sender._id,
-                });
+                state.selectedChatMessages.push(message);
             }
         },
+            
+            
         updateRecentChatList: (state, action) => {
             const { message, currentUserId } = action.payload;
             
@@ -95,7 +98,7 @@ export const {
     setSelectedChatData, 
     setSelectedChatMessages,
     addMessage, 
-    setReceivedMessage, 
+    setReceivedMessage,
     closeChat, 
     recentUsersList 
 } = chatSlice.actions;

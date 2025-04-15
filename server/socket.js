@@ -58,11 +58,10 @@ export const setupSocket = (server) => {
         
         socket.on("send_Group_Message", async (message) => {
 
-            const {groupId, sender, content, messageType, fileUrl } = message;
+            const { groupId, sender, content, messageType, fileUrl } = message;
         
             const createdMessage = await Message.create({
-                sender, 
-                recipient: null,
+                sender,  recipient: null,
                 content,
                 messageType,
                 fileUrl,
@@ -86,12 +85,13 @@ export const setupSocket = (server) => {
                     if(memberSocketId){
                         io.to(memberSocketId).emit("receive_Group_Message", finalData);
                     }
-                })
 
+                })
                 const adminSocketId = userSocketMap.get(group.admin._id.toString());
                 if(adminSocketId){
-                    io.to(adminSocketId).emit("receive_Group_Message", finalData)
+                    io.to(adminSocketId).emit("receive_Group_Message", finalData);
                 }
+
             }
         });
 

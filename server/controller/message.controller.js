@@ -104,3 +104,32 @@ export const CreateGroup = async (req, res) => {
         });
     }
 };
+
+export const getGroupMessage = async (req, res) => {
+    try {
+      const groupId = req.params.id;
+  
+      console.log(groupId);
+  
+      const group = await Group.findById(groupId)
+        .populate({
+          path: "messages",
+          populate: {
+            path: "sender",
+            select: "name username email",
+          },
+        });
+  
+      if (!group) {
+        return res.status(400).send("Group not found");
+      }
+  
+      const messages = group.messages;
+  
+      return res.status(200).json({ success: true, messages });
+      
+    } catch (error) {
+      return res.status(500).send("Internal Server Error while fetching group messages!");
+    }
+  };
+  
