@@ -69,7 +69,7 @@ const browserRouter = createBrowserRouter([
           });
           
           socketio.on('receiveMessage', (message) => {
-            dispatch(setReceivedMessage(message));
+            dispatch(addMessage(message));
           });
       
           socketio.on('receive_Group_Message', (message) => {
