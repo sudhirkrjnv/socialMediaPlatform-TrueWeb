@@ -61,26 +61,52 @@ const chatSlice = createSlice({
         },
             
             
+        // updateRecentIndividualChatList: (state, action) => {
+        //     const { message, currentUserId } = action.payload;
+            
+        //     const otherUser = message.sender._id === currentUserId 
+        //         ? message.recipient 
+        //         : message.sender;
+        
+        //     state.individualList = state.individualList.filter(
+        //         chat => chat._id !== otherUser._id
+        //     );
+        
+        //     state.individualList.unshift({
+        //         _id: otherUser._id,
+        //         username: otherUser.username,
+        //         name: otherUser.name,
+        //         profilePicture: otherUser.profilePicture,
+        //         lastMessageTime: message.timestamp,
+        //         lastMessage: message.message
+        //     });
+        // },
         updateRecentIndividualChatList: (state, action) => {
             const { message, currentUserId } = action.payload;
-            
+        
             const otherUser = message.sender._id === currentUserId 
                 ? message.recipient 
                 : message.sender;
         
-            state.individualList = state.individualList.filter(
-                chat => chat._id !== otherUser._id
-            );
+            const index = state.individualList.findIndex(chat => chat._id === otherUser._id);
         
-            state.individualList.unshift({
-                _id: otherUser._id,
-                username: otherUser.username,
-                name: otherUser.name,
-                profilePicture: otherUser.profilePicture,
-                lastMessageTime: message.timestamp,
-                lastMessage: message.message
-            });
+            if (index !== -1) {
+                const [chat] = state.individualList.splice(index, 1);
+                chat.lastMessage = message.message;
+                chat.lastMessageTime = message.timestamp;
+                state.individualList.unshift(chat);
+            } else {
+                state.individualList.unshift({
+                    _id: otherUser._id,
+                    username: otherUser.username,
+                    name: otherUser.name,
+                    profilePicture: otherUser.profilePicture,
+                    lastMessage: message.message,
+                    lastMessageTime: message.timestamp
+                });
+            }
         },
+
         updateRecentGroupChatList: (state, action) => {
             const message = action.payload;
             const index = state.groupList.findIndex(group => group._id === message.groupId);
