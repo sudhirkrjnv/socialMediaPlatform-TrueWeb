@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData, setIndividualList, setSelectedChatMessages, updateRecentIndividualChatList, setGroupList } from '../../../redux/ChatSlice.js';
+import { setSelectedChatType, setSelectedChatData, setIndividualList, setSelectedChatMessages, setGroupList } from '../../../redux/ChatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import {AddCommentOutlined, MoreVertOutlined, FiberManualRecord, Group} from '@mui/icons-material';
@@ -18,16 +18,18 @@ function ChatPage() {
     const [groupChatOpen, setGroupChatOpen] = useState(false);
     const {individualList, selectedChatData, groupList} = useSelector(store => store.chat);
     const { userStatus } = useSelector((store) => store.socket);
-    const { user } = useSelector((store) => store.auth);
-    const { socket } = useSelector((store) => store.socket);
 
     useEffect(() => {
         const fetchRecentChats = async () => {
             try {
-                const res = await axios.get('http://localhost:8000/api/v1/message/recentUsersList', {
+                const res1 = await axios.get('http://localhost:8000/api/v1/message/recentUsersList', {
                     withCredentials: true
                 });
-                dispatch(setIndividualList(res.data.list));
+                const res2 = await axios.get('http://localhost:8000/api/v1/user/groups', {
+                    withCredentials: true
+                });
+                dispatch(setIndividualList(res1.data.list));
+                dispatch(setGroupList(res2.data.groups));
             } catch (error) {
                 console.error("Error fetching recent chats:", error);
             }
@@ -36,39 +38,6 @@ function ChatPage() {
         fetchRecentChats();
     }, [dispatch]);
 
-    useEffect(() => {
-        const fetchgroupList = async () => {
-            try {
-                const res = await axios.get('http://localhost:8000/api/v1/user/groups', {
-                    withCredentials: true
-                });
-                dispatch(setGroupList(res.data.groups));
-            } catch (error) {
-                console.error("Error fetching recent chats:", error);
-            }
-        }; 
-        fetchgroupList();
-    }, [dispatch]);
-
-
-    useEffect(() => {
-        if (!socket || !user) return;
-    
-        const handleUpdateIndividualList = (message) => {
-            dispatch(updateRecentIndividualChatList({
-                message,
-                currentUserId: user._id
-            }));
-        };
-    
-        socket.on('receiveMessage', handleUpdateIndividualList);
-        socket.on('sendMessage', handleUpdateIndividualList);
-    
-        return () => {
-            socket.off('receiveMessage', handleUpdateIndividualList);
-            socket.off('sendMessage', handleUpdateIndividualList);
-        };
-    }, [socket, user, dispatch]);
 
     const handleSelectedItem = (item) => {
 

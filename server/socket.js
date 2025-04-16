@@ -48,11 +48,9 @@ export const setupSocket = (server) => {
         
             if (recipientSocketId) {
                 io.to(recipientSocketId).emit("receiveMessage", messageData);
-                io.to(recipientSocketId).emit("updateIndividualList", messageData);
             }
             if (senderSocketId) {
                 io.to(senderSocketId).emit("messageSent", messageData);
-                io.to(senderSocketId).emit("updateIndividualList", messageData);
             }
         });
         

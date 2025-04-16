@@ -86,12 +86,11 @@ const chatSlice = createSlice({
             const index = state.groupList.findIndex(group => group._id === message.groupId);
         
             if (index !== -1) {
-                const [group] = state.groupList.splice(index, 1); // Remove from current position
-                // Optional: update last message if needed
+                const [group] = state.groupList.splice(index, 1);
                 group.lastMessage = message.message;
                 group.lastMessageTime = message.timestamp;
         
-                state.groupList.unshift(group); // Add to top
+                state.groupList.unshift(group);
             }
         },
 

@@ -66,22 +66,23 @@ const browserRouter = createBrowserRouter([
           
           socketio.on('messageSent', (message) => {
             dispatch(setReceivedMessage(message));
+            dispatch(updateRecentIndividualChatList({
+              message: message,
+              currentUserId: user._id,
+            }));
           });
           
           socketio.on('receiveMessage', (message) => {
             dispatch(addMessage(message));
+            dispatch(updateRecentIndividualChatList({
+              message: message,
+              currentUserId: user._id,
+            }));
           });
       
           socketio.on('receive_Group_Message', (message) => {
             dispatch(addMessage(message));
             dispatch(updateRecentGroupChatList(message));
-          });
-       
-          socketio.on('updateIndividualList', (message) => {
-              dispatch(updateRecentIndividualChatList({
-                  message: message,
-                  currentUserId: user._id,
-              }));
           });
 
         return () => {
