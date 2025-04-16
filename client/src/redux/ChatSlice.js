@@ -81,6 +81,20 @@ const chatSlice = createSlice({
                 lastMessage: message.message
             });
         },
+        updateRecentGroupChatList: (state, action) => {
+            const message = action.payload;
+            const index = state.groups.findIndex(group => group._id === message.groupId);
+        
+            if (index !== -1) {
+                const [group] = state.groups.splice(index, 1); // Remove from current position
+                // Optional: update last message if needed
+                group.lastMessage = message.message;
+                group.lastMessageTime = message.timestamp;
+        
+                state.groups.unshift(group); // Add to top
+            }
+        },
+
         closeChat: (state) => {
             state.selectedChatType = undefined;
             state.selectedChatData = undefined;
@@ -94,7 +108,8 @@ export const {
     setGroups, 
     addGroups, 
     setRecentChatList, 
-    updateRecentChatList, 
+    updateRecentChatList,
+    updateRecentGroupChatList, 
     setSelectedChatData, 
     setSelectedChatMessages,
     addMessage, 
