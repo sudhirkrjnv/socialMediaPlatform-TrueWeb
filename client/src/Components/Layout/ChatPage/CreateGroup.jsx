@@ -2,7 +2,7 @@ import React, { useEffect , useState} from 'react'
 import axios from 'axios';
 import { MultiSelect } from 'primereact/multiselect';
 import { useDispatch } from 'react-redux';
-import { addGroups } from '../../../redux/chatSlice.js';
+import { addGroupList } from '../../../redux/ChatSlice.js';
 
 function CreateGroup({onClose}) {
 
@@ -43,7 +43,7 @@ function CreateGroup({onClose}) {
               setGroupName("");
               setSelectedMembers([]);
               onClose();
-              dispatch(addGroups(res.data.groups));
+              dispatch(addGroupList(res.data.groups));
             }
           }
           

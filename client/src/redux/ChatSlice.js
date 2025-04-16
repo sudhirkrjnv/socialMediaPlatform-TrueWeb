@@ -7,7 +7,7 @@ const chatSlice = createSlice({
         selectedChatData: undefined,
         selectedChatMessages: [],
         recentChatList: [],
-        groups: [],
+        groupList: [],
     },
     reducers: {
         setSelectedChatType: (state, action) => {
@@ -19,14 +19,14 @@ const chatSlice = createSlice({
         setSelectedChatMessages: (state, action) => {
             state.selectedChatMessages = action.payload;
         },
-        setGroups: (state, action) => {
-            state.groups = action.payload;
+        setGroupList: (state, action) => {
+            state.groupList = action.payload;
         },
         setRecentChatList: (state, action) => {
             state.recentChatList = action.payload;
         },
-        addGroups: (state, action) => {
-            state.groups = [...action.payload, ...state.groups];
+        addGroupList: (state, action) => {
+            state.groupList = [...action.payload, ...state.groupList];
         },
         addMessage: (state, action) => {
             const message = action.payload;
@@ -83,15 +83,15 @@ const chatSlice = createSlice({
         },
         updateRecentGroupChatList: (state, action) => {
             const message = action.payload;
-            const index = state.groups.findIndex(group => group._id === message.groupId);
+            const index = state.groupList.findIndex(group => group._id === message.groupId);
         
             if (index !== -1) {
-                const [group] = state.groups.splice(index, 1); // Remove from current position
+                const [group] = state.groupList.splice(index, 1); // Remove from current position
                 // Optional: update last message if needed
                 group.lastMessage = message.message;
                 group.lastMessageTime = message.timestamp;
         
-                state.groups.unshift(group); // Add to top
+                state.groupList.unshift(group); // Add to top
             }
         },
 
@@ -105,8 +105,8 @@ const chatSlice = createSlice({
 
 export const { 
     setSelectedChatType, 
-    setGroups, 
-    addGroups, 
+    setGroupList, 
+    addGroupList, 
     setRecentChatList, 
     updateRecentChatList,
     updateRecentGroupChatList, 

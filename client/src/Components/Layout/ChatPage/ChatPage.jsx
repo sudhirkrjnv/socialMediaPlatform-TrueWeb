@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData, setRecentChatList, setSelectedChatMessages,updateRecentChatList, setGroups } from '../../../redux/chatSlice.js';
+import { setSelectedChatType, setSelectedChatData, setRecentChatList, setSelectedChatMessages,updateRecentChatList, setGroupList } from '../../../redux/chatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import {AddCommentOutlined, MoreVertOutlined, FiberManualRecord, Group} from '@mui/icons-material';
@@ -16,7 +16,7 @@ function ChatPage() {
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [privateChatOpen, setPrivateChatOpen] = useState(false);
     const [groupChatOpen, setGroupChatOpen] = useState(false);
-    const {recentChatList, selectedChatData, groups} = useSelector(store => store.chat);
+    const {recentChatList, selectedChatData, groupList} = useSelector(store => store.chat);
     const { userStatus } = useSelector((store) => store.socket);
     const { user } = useSelector((store) => store.auth);
     const { socket } = useSelector((store) => store.socket);
@@ -37,17 +37,17 @@ function ChatPage() {
     }, [dispatch]);
 
     useEffect(() => {
-        const fetchgroups = async () => {
+        const fetchgroupList = async () => {
             try {
                 const res = await axios.get('http://localhost:8000/api/v1/user/groups', {
                     withCredentials: true
                 });
-                dispatch(setGroups(res.data.groups));
+                dispatch(setGroupList(res.data.groups));
             } catch (error) {
                 console.error("Error fetching recent chats:", error);
             }
         }; 
-        fetchgroups();
+        fetchgroupList();
     }, [dispatch]);
 
 
@@ -72,7 +72,7 @@ function ChatPage() {
 
     const handleSelectedItem = (item) => {
 
-        const isGroupChat = groups.some(group => group._id === item._id);
+        const isGroupChat = groupList.some(group => group._id === item._id);
         
         if(isGroupChat){
             dispatch(setSelectedChatType("Group"));
@@ -149,8 +149,8 @@ function ChatPage() {
                             )   
                         }
                         {   
-                            groups?.length > 0 &&
-                            groups.map((chat) => (
+                            groupList?.length > 0 &&
+                            groupList.map((chat) => (
                                 <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>
                                     <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
                                         <div style={{display:'flex', alignItems:'center'}}>
