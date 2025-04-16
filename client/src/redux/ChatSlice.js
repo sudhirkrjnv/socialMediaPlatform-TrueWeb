@@ -6,7 +6,7 @@ const chatSlice = createSlice({
         selectedChatType: undefined,
         selectedChatData: undefined,
         selectedChatMessages: [],
-        recentChatList: [],
+        individualList: [],
         groupList: [],
     },
     reducers: {
@@ -22,8 +22,8 @@ const chatSlice = createSlice({
         setGroupList: (state, action) => {
             state.groupList = action.payload;
         },
-        setRecentChatList: (state, action) => {
-            state.recentChatList = action.payload;
+        setIndividualList: (state, action) => {
+            state.individualList = action.payload;
         },
         addGroupList: (state, action) => {
             state.groupList = [...action.payload, ...state.groupList];
@@ -61,18 +61,18 @@ const chatSlice = createSlice({
         },
             
             
-        updateRecentChatList: (state, action) => {
+        updateRecentIndividualChatList: (state, action) => {
             const { message, currentUserId } = action.payload;
             
             const otherUser = message.sender._id === currentUserId 
                 ? message.recipient 
                 : message.sender;
         
-            state.recentChatList = state.recentChatList.filter(
+            state.individualList = state.individualList.filter(
                 chat => chat._id !== otherUser._id
             );
         
-            state.recentChatList.unshift({
+            state.individualList.unshift({
                 _id: otherUser._id,
                 username: otherUser.username,
                 name: otherUser.name,
@@ -104,11 +104,11 @@ const chatSlice = createSlice({
 });
 
 export const { 
-    setSelectedChatType, 
+    setSelectedChatType,
     setGroupList, 
     addGroupList, 
-    setRecentChatList, 
-    updateRecentChatList,
+    setIndividualList, 
+    updateRecentIndividualChatList,
     updateRecentGroupChatList, 
     setSelectedChatData, 
     setSelectedChatMessages,
