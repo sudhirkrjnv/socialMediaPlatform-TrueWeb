@@ -77,7 +77,7 @@ function ChatPage() {
         if(isGroupChat){
             dispatch(setSelectedChatType("Group"));
         } else {
-            dispatch(setSelectedChatType("OneToOne"));
+            dispatch(setSelectedChatType("Individual"));
         }
         
         dispatch(setSelectedChatData(item));

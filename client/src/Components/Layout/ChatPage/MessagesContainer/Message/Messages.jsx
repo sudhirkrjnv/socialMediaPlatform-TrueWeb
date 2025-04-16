@@ -35,7 +35,7 @@ function Messages({}){
                         <div key={index}>
                             { showDate && ( <div style={{textAlign:'center', marginBottom:'10px', fontSize:'12px', color: "#666"}}>{moment(msg.timestamp).format("LL")}</div> ) }
                             {
-                                selectedChatType === "OneToOne"
+                                selectedChatType === "Individual"
                                 &&
                                 <div style={{display:'flex', justifyContent: msg.sender === selectedChatData._id ? 'flex-start' : 'flex-end' }}>
                                     {

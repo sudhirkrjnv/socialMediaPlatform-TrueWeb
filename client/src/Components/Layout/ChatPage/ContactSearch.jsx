@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData} from '../../../redux/chatSlice.js';
+import { setSelectedChatType, setSelectedChatData} from '../../../redux/ChatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import axios from 'axios';
@@ -29,7 +29,7 @@ function ContactSearch({onClose}) {
     };
 
     const handleSelectedItem = (item) => {
-        dispatch(setSelectedChatType("OneToOne"));
+        dispatch(setSelectedChatType("Individual"));
         dispatch(setSelectedChatData(item));
         setSearchedItems([]);
         setSearchTerm('');

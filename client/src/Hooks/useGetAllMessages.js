@@ -8,7 +8,7 @@ const useGetAllMessages = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const fetchOneToOneMessages = async () => {
+        const fetchIndividualMessages = async () => {
             try {
                 const res = await axios.get( `http://localhost:8000/api/v1/message/${selectedChatData?._id}/getmessages`, { withCredentials: true } );
                 if (res.data.success) {
@@ -30,8 +30,8 @@ const useGetAllMessages = () => {
         };
 
         if (selectedChatData?._id) {
-            if (selectedChatType === "OneToOne"){
-                fetchOneToOneMessages();
+            if (selectedChatType === "Individual"){
+                fetchIndividualMessages();
             } else if (selectedChatType === "Group"){
                 fetchGroupMessages();
             }

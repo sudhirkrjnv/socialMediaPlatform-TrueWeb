@@ -34,13 +34,13 @@ const chatSlice = createSlice({
             const isGroup = state.selectedChatType === 'Group';
             const isGroupMatched = isGroup && state.selectedChatData?._id === message.groupId;
         
-            const isOneToOne = state.selectedChatType === 'OneToOne';
-            const isOneToOneMatched =
-                isOneToOne &&
+            const isIndividual = state.selectedChatType === 'Individual';
+            const isIndividualMatched =
+                isIndividual &&
                 (state.selectedChatData?._id === message.sender._id ||
                  state.selectedChatData?._id === message.recipient._id);
         
-            if (isGroupMatched || isOneToOneMatched) {
+            if (isGroupMatched || isIndividualMatched) {
                 state.selectedChatMessages.push({
                     ...message,
                     recipient: isGroup ? message.recipient : message.recipient._id,

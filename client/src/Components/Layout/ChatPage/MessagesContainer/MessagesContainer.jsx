@@ -46,7 +46,7 @@ function MessagesContainer() {
     };
 
     const handlesendMessage = async()=>{
-        if(selectedChatType==="OneToOne"){
+        if(selectedChatType==="Individual"){
             socket.emit("sendMessage", {
                 sender: user._id,
                 content: message,
@@ -83,7 +83,7 @@ function MessagesContainer() {
                         
                         {/*  chat headers for Individual and groups */}
                         {
-                            selectedChatType === "OneToOne" && 
+                            selectedChatType === "Individual" && 
                             <div style={{display:'flex',flexDirection:'column', justifyContent:'center', alignItems:'center', width:'100%', height:'20%', marginBottom:'5vh'}}>
                                 <Avatar 
                                     src={selectedChatData?.profilePicture} 
