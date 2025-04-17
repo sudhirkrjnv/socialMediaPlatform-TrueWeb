@@ -60,27 +60,6 @@ const chatSlice = createSlice({
             }
         },
             
-            
-        // updateRecentIndividualChatList: (state, action) => {
-        //     const { message, currentUserId } = action.payload;
-            
-        //     const otherUser = message.sender._id === currentUserId 
-        //         ? message.recipient 
-        //         : message.sender;
-        
-        //     state.individualList = state.individualList.filter(
-        //         chat => chat._id !== otherUser._id
-        //     );
-        
-        //     state.individualList.unshift({
-        //         _id: otherUser._id,
-        //         username: otherUser.username,
-        //         name: otherUser.name,
-        //         profilePicture: otherUser.profilePicture,
-        //         lastMessageTime: message.timestamp,
-        //         lastMessage: message.message
-        //     });
-        // },
         updateRecentIndividualChatList: (state, action) => {
             const { message, currentUserId } = action.payload;
         

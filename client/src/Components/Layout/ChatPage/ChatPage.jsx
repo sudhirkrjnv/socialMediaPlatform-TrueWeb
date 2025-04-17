@@ -56,6 +56,14 @@ function ChatPage() {
         }
     };
 
+    const recentList = [...individualList, ...groupList]
+        .map(chat => ({
+            ...chat,
+            lastMessageTime: chat.lastMessageTime || chat.updatedAt || chat.createdAt,
+        }))
+        .filter(chat => chat.lastMessageTime)
+        .sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
+
     return (
         <>
             <div style={{ display: 'flex' }}>
@@ -88,23 +96,27 @@ function ChatPage() {
                     </div>
                     <div className='Profiles' style={{ overflowY: 'scroll', scrollBehavior: 'smooth', height: '86vh', width: '28vw' }}>
                         <h4 style={{ marginLeft: '1vw', marginTop: '2vh' }}>Recent Chats</h4>
-                        {
-                            individualList?.length > 0
+                    {
+                            recentList?.length > 0
                             ? (
-                                individualList.map((chat) => (
+                                recentList.map((chat) => (
                                     <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>
                                         {
                                             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
                                                 <div style={{display:'flex', alignItems:'center'}}>
-                                                    <Avatar src={chat.profilePicture} />
+                                                    <Avatar src={chat.profilePicture || "/broken-image.jpg"} sx={{ width: 40, height: 40 }}>
+                                                        {chat.members ? <Group /> : null}
+                                                    </Avatar>
                                                     <div style={{ paddingLeft: '0.5rem' }}>
                                                         <div><strong>{chat.name}</strong></div>
-                                                        <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>
+                                                        { chat.username && <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>}
                                                     </div>
                                                 </div>
                                                 <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
                                                     <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
-                                                    <FiberManualRecord fontSize='sx' style={{ color: userStatus[chat._id] === 'active' ? 'green' : 'red' }} />
+                                                    {!chat.members && (
+                                                        <FiberManualRecord style={{ color: userStatus[chat._id] === 'active' ? 'green' : 'red', fontSize:'1.2vh' }} />
+                                                    )}
                                                 </div>
                                             </div>
                                         }
@@ -116,24 +128,6 @@ function ChatPage() {
                                     <div>Recents Chat is Empty</div>
                                 </div>
                             )   
-                        }
-                        {   
-                            groupList?.length > 0 &&
-                            groupList.map((chat) => (
-                                <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>
-                                    <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
-                                        <div style={{display:'flex', alignItems:'center'}}>
-                                            <Avatar alt={chat.name} src="/broken-image.jpg" sx={{width:40, height:40}}><Group/></Avatar>
-                                            <div style={{ paddingLeft: '0.5rem', display:'flex', flexDirection:'column', justifyContent:'center' }}>
-                                                <div>{chat.name}</div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
                         }
                     </div>
                 </div>
