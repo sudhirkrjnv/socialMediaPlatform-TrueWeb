@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedChatType, setSelectedChatData, setIndividualList, setSelectedChatMessages, setGroupList } from '../../../redux/ChatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
-import {AddCommentOutlined, MoreVertOutlined, FiberManualRecord, Group} from '@mui/icons-material';
+import {AddCommentOutlined, MoreVertOutlined, Group} from '@mui/icons-material';
 import axios from 'axios';
 import MessagesContainer from './MessagesContainer/MessagesContainer.jsx';
 import { Popover } from 'react-tiny-popover';
@@ -18,6 +18,7 @@ function ChatPage() {
     const [groupChatOpen, setGroupChatOpen] = useState(false);
     const {individualList, selectedChatData, groupList} = useSelector(store => store.chat);
     const { userStatus } = useSelector((store) => store.socket);
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         const fetchRecentChats = async () => {
@@ -63,6 +64,13 @@ function ChatPage() {
         }))
         .filter(chat => chat.lastMessageTime)
         .sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
+    console.log(recentList);
+    
+    const filteredUsers = recentList
+        .filter((u) => {
+            const nameToSearch = u.username || u.name || "";
+            return nameToSearch.toLowerCase().includes(searchQuery.toLowerCase());
+        });
 
     return (
         <>
@@ -92,43 +100,44 @@ function ChatPage() {
                         </div>
                     </div>
                     <div>
-                        <input type='search' placeholder='Select Contacts or group from recent chat list' style={{ margin: '1vh 1vw', width: '28vw', borderRadius: '0.5rem', padding: '5px' }} />
+                        <input type='search' value={searchQuery} onChange={(e)=>setSearchQuery(e.target.value)} placeholder=' Search user or groups ... ' style={{ margin: '1vh 1vw', width: '28vw', borderRadius: '0.5rem', padding: '5px' }} />
                     </div>
                     <div className='Profiles' style={{ overflowY: 'scroll', scrollBehavior: 'smooth', height: '86vh', width: '28vw' }}>
                         <h4 style={{ marginLeft: '1vw', marginTop: '2vh' }}>Recent Chats</h4>
-                    {
-                            recentList?.length > 0
-                            ? (
-                                recentList.map((chat) => (
+                        {
+                            (searchQuery ? filteredUsers : recentList).length > 0 ? (
+                                (searchQuery ? filteredUsers : recentList).map((chat) => (
                                     <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>
-                                        {
-                                            <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
-                                                <div style={{display:'flex', alignItems:'center'}}>
-                                                    <Avatar src={chat.profilePicture || "/broken-image.jpg"} sx={{ width: 40, height: 40 }}>
-                                                        {chat.members ? <Group /> : null}
-                                                    </Avatar>
-                                                    <div style={{ paddingLeft: '0.5rem' }}>
-                                                        <div><strong>{chat.name}</strong></div>
-                                                        { chat.username && <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>}
-                                                    </div>
-                                                </div>
-                                                <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
-                                                    <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
-                                                    {!chat.members && (
-                                                        <FiberManualRecord style={{ color: userStatus[chat._id] === 'active' ? 'green' : 'red', fontSize:'1.2vh' }} />
-                                                    )}
+                                        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
+                                            <div style={{display:'flex', alignItems:'center'}}>
+                                                <Avatar src={chat.profilePicture || "/broken-image.jpg"} sx={{ width: 40, height: 40 }}>
+                                                    {chat.members ? <Group /> : null}
+                                                </Avatar>
+                                                <div style={{ paddingLeft: '0.5rem' }}>
+                                                    <div><strong>{chat.name}</strong></div>
+                                                    { chat.username && <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>}
                                                 </div>
                                             </div>
-                                        }
+                                            <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
+                                                <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
+                                                {!chat.members && (                                                  
+                                                    <span style={{fontSize:'8px'}}>
+                                                        {
+                                                            userStatus[chat._id] === 'active' ? '🟢' : '🔴'
+                                                        }
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        
                                     </div>
                                 ))
-                            ) 
-                            : (
+                            ) : (
                                 <div style={{ height: '40vh', width: '80%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'red', fontWeight: 'bolder' }}>
                                     <div>Recents Chat is Empty</div>
                                 </div>
-                            )   
-                        }
+                            )
+                        } 
                     </div>
                 </div>
                 <MessagesContainer />

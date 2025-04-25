@@ -50,7 +50,7 @@ export const setupSocket = (server) => {
                 io.to(recipientSocketId).emit("receiveMessage", messageData);
             }
             if (senderSocketId) {
-                io.to(senderSocketId).emit("messageSent", messageData);
+                io.to(senderSocketId).emit("receiveMessage", messageData);
             }
         });
         
@@ -90,6 +90,13 @@ export const setupSocket = (server) => {
                     io.to(adminSocketId).emit("receive_Group_Message", finalData);
                 }
 
+            }
+        });
+
+        socket.on("typing", (data) => {
+            const recipientSocketId = userSocketMap.get(data.recipient);
+            if(recipientSocketId){
+                io.to(recipientSocketId).emit("typing", data.sender);
             }
         });
 

@@ -6,18 +6,16 @@ import { deepOrange} from '@mui/material/colors';
 import Messages from './Message/Messages.jsx';
 import { useSelector} from 'react-redux';
 
-
 function MessagesContainer() {
 
     const { user } = useSelector((store) => store.auth);
-    const { socket } = useSelector((store) => store.socket);
+    const { socket , typingUser} = useSelector((store) => store.socket);
     const {selectedChatType, selectedChatData} = useSelector(store=>store.chat);
 
     const [message, setMessage] = useState('');
 
     const emojiPickerRef = useRef();
     const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
-
 
     const toggleEmojiPicker = () => {
         setEmojiPickerOpen(prev => !prev);
@@ -66,6 +64,13 @@ function MessagesContainer() {
         setMessage("");
     }
     
+    const handleTyping = ()=>{
+        socket.emit ("typing", {
+            sender : user._id,
+            recipient: selectedChatData?._id,
+        });
+    }
+    
   return (
     <div>
         <div style={{border:'1px solid black', height:'95vh', width:'45vw', marginTop:'2vh'}}>
@@ -80,6 +85,12 @@ function MessagesContainer() {
             : 
                 (
                     <div style={{ marginTop:'1vh', marginLeft:'1vw', height:'100%', width:'100%', overflow:'hidden'}} >
+
+                        {
+                            typingUser === selectedChatData?._id && (
+                                <p> typing...</p>
+                            )
+                        }
                         
                         {/*  chat headers for Individual and groups */}
                         {
@@ -117,7 +128,7 @@ function MessagesContainer() {
                         {/* messages sending box and its contents */}
                         <div style={{display:'flex', alignItems:'center'}}>
                             <div style={{width:'88%', height:'5vh', border:'1px solid pink', marginTop:'1vh', borderRadius:'0.4rem', display:'flex', alignItems:'center', overflow:'hidden'}}>
-                                <input type='text' value={message} onChange={(e) => setMessage(e.target.value.trim() ?  e.target.value : "")}  placeholder='send messages' style={{width:'88%', height:'5vh', fontFamily:"monospace", fontWeight:'bold',fontSize:'15px', outline:'none', border:'none', marginLeft:'10px', backgroundColor:'inherit'}}/>
+                                <input type='text' value={message} onChange={(e) =>{setMessage(e.target.value.trim() ?  e.target.value : ""); handleTyping() }}  placeholder='send messages' style={{width:'88%', height:'5vh', fontFamily:"monospace", fontWeight:'bold',fontSize:'15px', outline:'none', border:'none', marginLeft:'10px', backgroundColor:'inherit'}}/>
                                 <Attachment style={{marginTop:'5px', marginRight:'10px', transform:'rotate(135deg)'}}/>
                                 <SentimentSatisfiedAlt  onClick={toggleEmojiPicker} style={{marginTop:'5px', marginRight:'10px'}}/>
                             </div>

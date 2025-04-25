@@ -9,8 +9,8 @@ import Signup from './Components/Signup/Signup';
 import { useEffect} from 'react';
 import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
-import { setSocket, setUserStatus } from './redux/socketSlice';
-import { addMessage, setReceivedMessage, updateRecentIndividualChatList, updateRecentGroupChatList } from './redux/ChatSlice';
+import { clearTypingUser, setSocket, setTypingUser, setUserStatus } from './redux/socketSlice';
+import { addMessage, updateRecentIndividualChatList, updateRecentGroupChatList } from './redux/ChatSlice';
 
 const browserRouter = createBrowserRouter([
   {
@@ -54,41 +54,36 @@ const browserRouter = createBrowserRouter([
             query: { userId: user?._id },
             transports: ['websocket'],
           });
-          dispatch(setSocket(socketio));
+      dispatch(setSocket(socketio));
           
-          socketio.on('connect', () => {
-            console.log('Connected to socket server');
-          });
+      socketio.on('connect', () => {
+        console.log('Connected to socket server');
+      });
 
-          socketio.on('userStatus', (data) => {
-            dispatch(setUserStatus(data));
-          });
-          
-          socketio.on('messageSent', (message) => {
-            dispatch(setReceivedMessage(message));
-            dispatch(updateRecentIndividualChatList({
-              message: message,
-              currentUserId: user._id,
-            }));
-          });
-          
-          socketio.on('receiveMessage', (message) => {
-            dispatch(addMessage(message));
-            dispatch(updateRecentIndividualChatList({
-              message: message,
-              currentUserId: user._id,
-            }));
-          });
-      
-          socketio.on('receive_Group_Message', (message) => {
-            dispatch(addMessage(message));
-            dispatch(updateRecentGroupChatList(message));
-          });
+      socketio.on('userStatus', user._id);
 
-        return () => {
-            socketio.disconnect();
-            dispatch(setSocket(null));
-        };
+      socketio.on('receiveMessage', (message) => {
+        dispatch(addMessage(message));
+        dispatch(updateRecentIndividualChatList({
+          message: message,
+          currentUserId: user._id,
+        }));
+      });
+  
+      socketio.on('receive_Group_Message', (message) => {
+        dispatch(addMessage(message));
+        dispatch(updateRecentGroupChatList(message));
+      });
+
+      socketio.on('typing', (senderId) => {
+        dispatch(setTypingUser(senderId));
+        setTimeout(()=>dispatch(setTypingUser(null)), 2000);
+      });
+
+      return () => {
+          socketio.disconnect();
+          dispatch(setSocket(null));
+      };
     } else if(socket) {
         socket.disconnect();
         dispatch(setSocket(null));

@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import { useEffect, useRef } from 'react';
 import useGetAllMessages from '../../../../../Hooks/useGetAllMessages';
 
-function Messages({}){
+function Messages(){
 
     const { selectedChatType, selectedChatData, selectedChatMessages } = useSelector((store) => store.chat);
     const {user} = useSelector(store=>store.auth);
@@ -33,7 +33,7 @@ function Messages({}){
                     lastdate = msgDate;
                     return(
                         <div key={index}>
-                            { showDate && ( <div style={{textAlign:'center', marginBottom:'10px', fontSize:'12px', color: "#666"}}>{moment(msg.timestamp).format("LL")}</div> ) }
+                            { showDate && <div style={{textAlign:'center', marginBottom:'10px', fontSize:'12px', color: "#666"}}>{moment(msg.timestamp).format("LL")}</div> }
                             {
                                 selectedChatType === "Individual"
                                 &&

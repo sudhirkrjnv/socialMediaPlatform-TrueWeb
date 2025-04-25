@@ -5,6 +5,7 @@ const socketSlice = createSlice({
     initialState:{
         socket: null,
         userStatus: {},
+        typingUser: null,
     },
     reducers:{
         //actions
@@ -15,8 +16,11 @@ const socketSlice = createSlice({
             const { userId, status } = action.payload;
             state.userStatus[userId] = status;
         },
+        setTypingUser:(state, action)=>{
+            state.typingUser = action.payload;
+        },
     }
 })
 
-export const {setSocket, setUserStatus} = socketSlice.actions;
+export const {setSocket, setUserStatus, setTypingUser} = socketSlice.actions;
 export default socketSlice.reducer;
