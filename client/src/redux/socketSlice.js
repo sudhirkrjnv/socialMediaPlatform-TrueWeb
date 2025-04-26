@@ -4,6 +4,7 @@ const socketSlice = createSlice({
     name:"socket",
     initialState:{
         socket: null,
+        onlineUsers: [],
         typingUser: null,
     },
     reducers:{
@@ -11,11 +12,14 @@ const socketSlice = createSlice({
         setSocket:(state, action)=>{
             state.socket = action.payload;
         },
+        setOnlineUsers: (state, action) => {
+            state.onlineUsers = action.payload;
+        },
         setTypingUser:(state, action)=>{
             state.typingUser = action.payload;
         },
     }
 })
 
-export const {setSocket, setUserStatus, setTypingUser} = socketSlice.actions;
+export const {setSocket, setOnlineUsers, setTypingUser} = socketSlice.actions;
 export default socketSlice.reducer;

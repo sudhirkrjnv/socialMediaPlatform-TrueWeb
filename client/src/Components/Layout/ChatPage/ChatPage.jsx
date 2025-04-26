@@ -17,6 +17,7 @@ function ChatPage() {
     const [privateChatOpen, setPrivateChatOpen] = useState(false);
     const [groupChatOpen, setGroupChatOpen] = useState(false);
     const {individualList, selectedChatData, groupList} = useSelector(store => store.chat);
+    const { onlineUsers } = useSelector(store => store.socket);
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
@@ -119,6 +120,14 @@ function ChatPage() {
                                             </div>
                                             <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
                                                 <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
+                                                {/* add here for green if online , red for online  */}
+                                                {
+                                                    !chat.members && (
+                                                        <div style={{fontSize:'8px'}}>
+                                                            {onlineUsers.includes(chat._id) ? '🟢' : '🔴'}
+                                                        </div>
+                                                    )
+                                                }
                                             </div>
                                         </div>
                                         
