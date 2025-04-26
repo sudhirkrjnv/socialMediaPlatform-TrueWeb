@@ -20,7 +20,6 @@ export const setupSocket = (server) => {
         for (const [userId, socketId] of userSocketMap.entries()) {
             if (socketId === socket.id) {
                 userSocketMap.delete(userId);
-                io.emit('userStatus', { userId, status: 'inactive' });
                 break;
             }
         }
