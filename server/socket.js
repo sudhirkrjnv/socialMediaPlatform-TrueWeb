@@ -34,60 +34,34 @@ export const setupSocket = (server) => {
         }
         
         socket.on("sendMessage", async (message) => {
-            const senderSocketId = userSocketMap.get(message.sender);
-            const recipientSocketId = userSocketMap.get(message.recipient);
-        
-            const createdMessage = await Message.create(message);
-            
-            const messageData = await Message.findById(createdMessage._id)
-                .populate("sender", "username name profilePicture")
-                .populate("recipient", "username name profilePicture");
-        
-            if (recipientSocketId) {
-                io.to(recipientSocketId).emit("receiveMessage", messageData);
-            }
-            if (senderSocketId) {
-                io.to(senderSocketId).emit("receiveMessage", messageData);
-            }
-        });
-        
-        socket.on("send_Group_Message", async (message) => {
+            const messageData = await Message.create(message)
+                .then(m => m.populate("sender recipient", "username name profilePicture"));
 
-            const { groupId, sender, content, messageType, fileUrl } = message;
-        
-            const createdMessage = await Message.create({
-                sender,  recipient: null,
-                content,
-                messageType,
-                fileUrl,
-                timestamp: new Date(),
+            [message.sender, message.recipient].forEach(userId => {
+                const socketId = userSocketMap.get(userId.toString());
+                if (socketId) io.to(socketId).emit("receiveMessage", messageData);
             });
-            
-            const messageData = await Message.findById(createdMessage._id)
-                .populate("sender", "username name profilePicture")
-                .exec();
+        });
 
-            await Group.findByIdAndUpdate(groupId, {
-                $push: {messages: createdMessage._id},
-            })
-            const group =  await Group.findById(groupId).populate("members");
+        socket.on("send_Group_Message", async (message) => {
+            const messageData = await Message.create({
+                ...message,
+                recipient: null,
+                timestamp: new Date()
+            }).then(m => m.populate("sender", "username name profilePicture"));
 
-            const finalData = {...messageData._doc, groupId:group._id};
+            const group = await Group.findByIdAndUpdate(
+                message.groupId,
+                { $push: { messages: messageData._id } },
+                { new: true, populate: "members admin" }
+            );
 
-            if(group && group.members){
-                group.members.forEach((member)=>{
-                    const memberSocketId = userSocketMap.get(member._id.toString());
-                    if(memberSocketId){
-                        io.to(memberSocketId).emit("receive_Group_Message", finalData);
-                    }
+            if (!group) return;
 
-                })
-                const adminSocketId = userSocketMap.get(group.admin._id.toString());
-                if(adminSocketId){
-                    io.to(adminSocketId).emit("receive_Group_Message", finalData);
-                }
-
-            }
+            [...group.members, group.admin].forEach(member => {
+                const socketId = userSocketMap.get(member._id.toString());
+                if (socketId) io.to(socketId).emit("receive_Group_Message", { ...messageData._doc, groupId: group._id });
+            });
         });
 
         socket.on("typing", (data) => {
