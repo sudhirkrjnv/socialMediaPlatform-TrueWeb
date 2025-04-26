@@ -73,9 +73,9 @@ const browserRouter = createBrowserRouter([
         dispatch(updateRecentGroupChatList(message));
       });
 
-      // socketio.on('onlineUsers', (onlineUsers) => {
-      //   dispatch(setOnlineUsers(onlineUsers));
-      // });
+      socketio.on('onlineUsers', (onlineUsers) => {
+        dispatch(setOnlineUsers(onlineUsers));
+      });
 
       socketio.on('typing', (senderId) => {
         dispatch(setTypingUser(senderId));
