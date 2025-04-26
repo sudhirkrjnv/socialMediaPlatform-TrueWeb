@@ -49,43 +49,37 @@ const chatSlice = createSlice({
             }
         },
             
-        updateRecentIndividualChatList: (state, action) => {
-            const { message, currentUserId } = action.payload;
-        
-            const otherUser = message.sender._id === currentUserId 
-                ? message.recipient 
-                : message.sender;
-        
-            const index = state.individualList.findIndex(chat => chat._id === otherUser._id);
-        
-            if (index !== -1) {
-                const [chat] = state.individualList.splice(index, 1);
-                chat.lastMessage = message.message;
-                chat.lastMessageTime = message.timestamp;
-                state.individualList.unshift(chat);
-            } else {
-                state.individualList.unshift({
-                    _id: otherUser._id,
-                    username: otherUser.username,
-                    name: otherUser.name,
-                    profilePicture: otherUser.profilePicture,
+        updateRecentIndividualChatList: (state, { payload: { message, currentUserId } }) => {
+            const otherUser = message.sender._id === currentUserId ? message.recipient : message.sender;
+            const existingChat = state.individualList.find(chat => chat._id === otherUser._id);
+            
+            state.individualList = [
+                {
+                    ...(existingChat || {
+                        _id: otherUser._id,
+                        username: otherUser.username,
+                        name: otherUser.name,
+                        profilePicture: otherUser.profilePicture,
+                    }),
                     lastMessage: message.message,
-                    lastMessageTime: message.timestamp
-                });
-            }
+                    lastMessageTime: message.timestamp,
+                },
+                ...state.individualList.filter(chat => chat._id !== otherUser._id),
+            ];
         },
-
-        updateRecentGroupChatList: (state, action) => {
-            const message = action.payload;
-            const index = state.groupList.findIndex(group => group._id === message.groupId);
         
-            if (index !== -1) {
-                const [group] = state.groupList.splice(index, 1);
-                group.lastMessage = message.message;
-                group.lastMessageTime = message.timestamp;
-        
-                state.groupList.unshift(group);
-            }
+        updateRecentGroupChatList: (state, { payload: message }) => {
+            const existingGroup = state.groupList.find(group => group._id === message.groupId);
+            if (!existingGroup) return;
+            
+            state.groupList = [
+                {
+                    ...existingGroup,
+                    lastMessage: message.message,
+                    lastMessageTime: message.timestamp,
+                },
+                ...state.groupList.filter(group => group._id !== message.groupId),
+            ];
         },
 
         closeChat: (state) => {
