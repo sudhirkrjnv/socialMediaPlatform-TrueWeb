@@ -55,10 +55,6 @@ const browserRouter = createBrowserRouter([
             transports: ['websocket'],
           });
       dispatch(setSocket(socketio));
-
-      window.addEventListener("beforeunload", () => {
-        socketio.disconnect();
-      });
           
       socketio.on('connect', () => {
         console.log('Connected to socket server');
@@ -77,9 +73,9 @@ const browserRouter = createBrowserRouter([
         dispatch(updateRecentGroupChatList(message));
       });
 
-      socketio.on('onlineUsers', (onlineUsers) => {
-        dispatch(setOnlineUsers(onlineUsers));
-      });
+      // socketio.on('onlineUsers', (onlineUsers) => {
+      //   dispatch(setOnlineUsers(onlineUsers));
+      // });
 
       socketio.on('typing', (senderId) => {
         dispatch(setTypingUser(senderId));

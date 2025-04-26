@@ -15,20 +15,21 @@ export const setupSocket = (server) => {
 
     const userSocketMap = new Map();
 
-    const getOnlineUsers = () => {
-        return Array.from(userSocketMap.keys());
-    };
+    const disconnect = (socket)=>{
+        console.log(`client disconnected : ${socket.id}`);
+        for(const [userId, socketId] of userSocketMap.entries()){
+            if(socketId === socket.id){
+                userSocketMap.delete(userId);
+                break;
+            }
+        }
+    }
 
     io.on('connection', (socket) => {
         const userId = socket.handshake.query.userId;
         if (userId) {
-            if (userSocketMap.has(userId)) {
-              userSocketMap.get(userId).add(socket.id);
-            } else {
-              userSocketMap.set(userId, new Set([socket.id]));
-            }
+            userSocketMap.set(userId, socket.id);
             console.log(`User connected: ${userId} with Socket Id: ${socket.id}`);
-            io.emit('onlineUsers', getOnlineUsers());
         } else {
             console.log('User Id not provided during connection');
         }
@@ -71,16 +72,6 @@ export const setupSocket = (server) => {
             }
         });
 
-        socket.on('disconnect', () => {
-            if (userId && userSocketMap.has(userId)) {
-              const userSockets = userSocketMap.get(userId);
-              userSockets.delete(socket.id);
-              if (userSockets.size === 0) {
-                userSocketMap.delete(userId);
-              }
-              io.emit('onlineUsers', getOnlineUsers());
-            }
-            console.log(`Client Disconnected : ${socket.id}`);
-        });
+        socket.on('disconnect', ()=>disconnect(socket));
     });
 };
