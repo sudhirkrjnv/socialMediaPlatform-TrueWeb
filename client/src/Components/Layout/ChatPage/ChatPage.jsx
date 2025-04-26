@@ -17,7 +17,6 @@ function ChatPage() {
     const [privateChatOpen, setPrivateChatOpen] = useState(false);
     const [groupChatOpen, setGroupChatOpen] = useState(false);
     const {individualList, selectedChatData, groupList} = useSelector(store => store.chat);
-    const { userStatus } = useSelector((store) => store.socket);
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
@@ -120,13 +119,6 @@ function ChatPage() {
                                             </div>
                                             <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
                                                 <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
-                                                {!chat.members && (                                                  
-                                                    <span style={{fontSize:'8px'}}>
-                                                        {
-                                                            userStatus[chat._id] === 'active' ? '🟢' : '🔴'
-                                                        }
-                                                    </span>
-                                                )}
                                             </div>
                                         </div>
                                         

@@ -30,7 +30,6 @@ export const setupSocket = (server) => {
         const userId = socket.handshake.query.userId;
         if (userId) {
             userSocketMap.set(userId, socket.id);
-            io.emit('userStatus', { userId, status: 'active' });
             console.log(`User connected: ${userId} with Socket Id: ${socket.id}`);
         } else {
             console.log('User Id not provided during connection');
