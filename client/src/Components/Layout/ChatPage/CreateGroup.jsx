@@ -43,7 +43,7 @@ function CreateGroup({onClose}) {
               setGroupName("");
               setSelectedMembers([]);
               onClose();
-              dispatch(addGroupList(res.data.groups));
+              dispatch(addGroupList(res.data.group));
             }
           }
           
