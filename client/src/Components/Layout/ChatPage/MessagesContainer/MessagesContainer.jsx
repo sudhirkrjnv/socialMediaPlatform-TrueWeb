@@ -9,7 +9,7 @@ import { useSelector} from 'react-redux';
 function MessagesContainer() {
 
     const { user } = useSelector((store) => store.auth);
-    const { socket , typingUser} = useSelector((store) => store.socket);
+    const { socket , typingData} = useSelector((store) => store.socket);
     const {selectedChatType, selectedChatData} = useSelector(store=>store.chat);
 
     const [message, setMessage] = useState('');
@@ -65,10 +65,17 @@ function MessagesContainer() {
     }
     
     const handleTyping = ()=>{
-        socket.emit ("typing", {
-            sender : user._id,
-            recipient: selectedChatData?._id,
-        });
+        if (selectedChatType === "Individual") {
+            socket.emit("typing", {
+                sender: user._id,
+                recipient: selectedChatData?._id
+            });
+        } else if (selectedChatType === "Group") {
+            socket.emit("typing", {
+                sender: user._id,
+                groupId: selectedChatData?._id
+            });
+        }
     }
     
   return (
@@ -122,7 +129,7 @@ function MessagesContainer() {
 
                         {/* messages displaying */}
                         <div style={{width:'95%', height:'65%'}}>
-                            <Messages selectedChatData = {selectedChatData} typingUser={typingUser}/>
+                            <Messages selectedChatData = {selectedChatData} typingData={typingData}/>
                         </div>
 
                         {/* messages sending box and its contents */}

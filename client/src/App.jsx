@@ -9,7 +9,7 @@ import Signup from './Components/Signup/Signup';
 import { useEffect} from 'react';
 import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
-import { setSocket, setTypingUser, setOnlineUsers} from './redux/socketSlice';
+import { setSocket, setTypingData, setOnlineUsers} from './redux/socketSlice';
 import { addMessage,addGroupList, updateRecentIndividualChatList, updateRecentGroupChatList } from './redux/ChatSlice';
 
 const browserRouter = createBrowserRouter([
@@ -81,9 +81,9 @@ const browserRouter = createBrowserRouter([
         dispatch(setOnlineUsers(onlineUsers));
       });
 
-      socketio.on('typing', (senderId) => {
-        dispatch(setTypingUser(senderId));
-        setTimeout(()=>dispatch(setTypingUser(null)), 2000);
+      socketio.on('typing', (data) => {
+        dispatch(setTypingData(data));
+        setTimeout(()=>dispatch(setTypingData(null)), 2000);
       });
 
       return () => {

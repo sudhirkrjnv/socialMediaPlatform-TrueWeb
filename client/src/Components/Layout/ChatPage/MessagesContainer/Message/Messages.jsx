@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import { useEffect, useRef } from 'react';
 import useGetAllMessages from '../../../../../Hooks/useGetAllMessages';
 
-function Messages({typingUser}){
+function Messages({typingData}){
 
     const { selectedChatType, selectedChatData, selectedChatMessages } = useSelector((store) => store.chat);
     const {user} = useSelector(store=>store.auth);
@@ -20,7 +20,7 @@ function Messages({typingUser}){
         if(scrollRef.current){
             scrollRef.current.scrollIntoView({behavior:"smooth"});
         }
-    }, [selectedChatMessages, typingUser]);
+    }, [selectedChatMessages, typingData]);
 
 
     return (
@@ -84,7 +84,7 @@ function Messages({typingUser}){
                     )
                 })
             } 
-            {   
+            {/* {   
                 selectedChatType === "Individual" &&
                     typingUser === selectedChatData._id && (
                         <div style={{display:'flex', justifyContent: 'flex-start' }}>
@@ -93,6 +93,47 @@ function Messages({typingUser}){
                             </div>
                         </div>
                     )
+            } */}
+            {selectedChatType === "Individual" && 
+                typingData?.senderId === selectedChatData?._id && 
+                !typingData?.isGroup && (
+                    <div style={{display:'flex', justifyContent: 'flex-start' }}>
+                        <div style={{
+                            backgroundColor: "#FFFFFF",
+                            marginBottom: "8px",
+                            maxWidth: "60%",
+                            padding: "10px",
+                            borderRadius: "10px",
+                            wordBreak: "break-word",
+                            boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
+                            fontStyle: 'italic',
+                            color: '#666'
+                        }}>
+                            typing...
+                        </div>
+                    </div>
+                )
+            }
+
+            {selectedChatType === "Group" && 
+                typingData?.groupId === selectedChatData?._id && 
+                typingData?.isGroup && (
+                    <div style={{display:'flex', justifyContent: 'flex-start' }}>
+                        <div style={{
+                            backgroundColor: "#FFFFFF",
+                            marginBottom: "8px",
+                            maxWidth: "60%",
+                            padding: "10px",
+                            borderRadius: "10px",
+                            wordBreak: "break-word",
+                            boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
+                            fontStyle: 'italic',
+                            color: '#666'
+                        }}>
+                            {typingData.displayName || 'Someone'} is typing...
+                        </div>
+                    </div>
+                )
             }
             <div ref={scrollRef} />
         </div>

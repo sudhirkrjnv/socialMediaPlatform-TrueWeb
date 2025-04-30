@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import { Message } from './models/message.models.js';
 import {Group} from './models/group.model.js'
-
+import { User } from './models/user.model.js'
 
 export const setupSocket = (server) => {
     
@@ -96,10 +96,38 @@ export const setupSocket = (server) => {
             });
         });
 
-        socket.on("typing", (data) => {
-            const recipientSocketIds = userSocketsMap.get(data.recipient);
-            if (recipientSocketIds) {
-                recipientSocketIds.forEach(sid => io.to(sid).emit("typing", data.sender));
+        socket.on("typing", async(data) => {
+            try {
+                if (data.groupId) {
+                    const sender = await User.findById(data.sender).select('name username');
+                    const group = await Group.findById(data.groupId).populate("members admin");
+                    
+                    [...group.members, group.admin].forEach(member => {
+                        if (member._id.toString() !== data.sender) {
+                            const socketIds = userSocketsMap.get(member._id.toString());
+                            if (socketIds) {
+                                socketIds.forEach(sid => io.to(sid).emit("typing", {
+                                    senderId: data.sender,
+                                    displayName: sender.name || sender.username,
+                                    groupId: data.groupId,
+                                    isGroup: true
+                                }));
+                            }
+                        }
+                    });
+                } else {  
+                    const recipientSocketIds = userSocketsMap.get(data.recipient);
+                    if (recipientSocketIds) {
+                        recipientSocketIds.forEach(sid => io.to(sid).emit("typing", {
+                            senderId: data.sender,
+                            recipient: data.recipient,
+                            isGroup: false
+                        }));
+                    }
+                }
+                
+            } catch (error) {
+                console.error("Error in handling typing indicator", error);
             }
         });
 
