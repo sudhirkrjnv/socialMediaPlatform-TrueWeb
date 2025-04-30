@@ -57,6 +57,15 @@ export const setupSocket = (server) => {
             });
         });
 
+        socket.on("newGroupCreated", ({ group, memberIds }) => {
+            memberIds.forEach(userId => {
+                const socketIds = userSocketsMap.get(userId?.toString());
+                if (socketIds) {
+                    socketIds.forEach(sid => io.to(sid).emit("addNewGroup", group));
+                }
+            });
+        });
+
         socket.on("send_Group_Message", async (message) => {
             const messageData = await Message.create({
                 ...message,

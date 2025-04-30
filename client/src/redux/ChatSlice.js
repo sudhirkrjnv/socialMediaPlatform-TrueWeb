@@ -26,9 +26,12 @@ const chatSlice = createSlice({
             state.groupList = action.payload;
         },
         addGroupList: (state, action) => {
-            state.groupList = Array.isArray(action.payload) 
-            ? [...action.payload, ...state.groupList]
-            : [action.payload, ...state.groupList];
+            const groupExists = state.groupList.some(g => g._id === action.payload._id);
+            if (!groupExists) {
+                state.groupList = Array.isArray(action.payload) 
+                ? [...action.payload, ...state.groupList]
+                : [action.payload, ...state.groupList];
+            }
         },
         addMessage: (state, action) => {
             const message = action.payload;

@@ -1,7 +1,7 @@
 import React, { useEffect , useState} from 'react'
 import axios from 'axios';
 import { MultiSelect } from 'primereact/multiselect';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { addGroupList } from '../../../redux/ChatSlice.js';
 
 function CreateGroup({onClose}) {
@@ -9,7 +9,7 @@ function CreateGroup({onClose}) {
       const [allMembers, setAllMembers] = useState([]);
       const [selectedMembers, setSelectedMembers] = useState([]);
       const [groupName, setGroupName] = useState("");
-
+      const { socket } = useSelector((store) => store.socket);
       const dispatch = useDispatch();
       
       useEffect(()=>{
@@ -24,13 +24,6 @@ function CreateGroup({onClose}) {
       
       const creategroup = async()=>{
         try {
-          
-          // console.log({
-          //   name: groupName, 
-          //   allMembers,
-          //   selectedMembers,
-          //   members: selectedMembers.map((member)=>member)
-          // })
           if(groupName.length >= 0 && selectedMembers.length > 0){
             const res = await axios.post('http://localhost:8000/api/v1/message/createGroup',
               {
@@ -44,6 +37,10 @@ function CreateGroup({onClose}) {
               setSelectedMembers([]);
               onClose();
               dispatch(addGroupList(res.data.group));
+              socket.emit('newGroupCreated', {
+                group: res.data.group,
+                memberIds: selectedMembers.map(m => m.value)
+            });
             }
           }
           
