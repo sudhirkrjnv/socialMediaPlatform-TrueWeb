@@ -40,7 +40,14 @@ function CreateGroup({onClose}) {
               socket.emit('newGroupCreated', {
                 group: res.data.group,
                 memberIds: selectedMembers.map(m => m.value)
-            });
+              });
+              if(res.data.systemMessage) {
+                dispatch(addMessage({
+                    ...res.data.systemMessage,
+                    groupId: res.data.group._id,
+                    sender: { _id: user._id, name: user.name }
+                }));
+              }
             }
           }
           

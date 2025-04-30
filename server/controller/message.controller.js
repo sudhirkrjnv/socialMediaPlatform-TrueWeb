@@ -88,12 +88,30 @@ export const CreateGroup = async (req, res) => {
             members,
             admin: userId
         });
-        await newGroup.save()
+        await newGroup.save();
+
+        const systemMessage = new Message({
+            sender: userId,
+            recipient: null,
+            groupId: newGroup._id,
+            messageType: "text",
+            content: `Group "<strong>${name}</strong>" Created by <strong>${admin.name}</strong><br/><strong>${validMembers.length + 1} members </strong> (including admin)`,
+            isSystemMessage: true,
+            timestamp: new Date()
+        });
+        await systemMessage.save();
+
+        await Group.findByIdAndUpdate(
+            newGroup._id,
+            { $push: { messages: systemMessage._id } },
+            { new: true }
+        );
             
         return res.status(201).json({
             success: true,
             message: "Group created successfully",
-            group: newGroup
+            group: newGroup,
+            systemMessage: systemMessage
         });
             
 

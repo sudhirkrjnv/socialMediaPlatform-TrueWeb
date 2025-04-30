@@ -61,7 +61,14 @@ export const setupSocket = (server) => {
             memberIds.forEach(userId => {
                 const socketIds = userSocketsMap.get(userId?.toString());
                 if (socketIds) {
-                    socketIds.forEach(sid => io.to(sid).emit("addNewGroup", group));
+                    socketIds.forEach(sid => {
+                        io.to(sid).emit("addNewGroup", group);
+                        io.to(sid).emit("receive_Group_Message", {
+                            ...group.systemMessage,
+                            groupId: group._id,
+                            sender: group.admin
+                        });
+                    });
                 }
             });
         });

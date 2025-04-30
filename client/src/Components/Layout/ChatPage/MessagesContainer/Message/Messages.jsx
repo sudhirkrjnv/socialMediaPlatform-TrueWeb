@@ -53,11 +53,21 @@ function Messages(){
                                 </div>
                             }
                             {
-                                selectedChatType === "Group"
-                                &&
-                                <div style={{display:'flex', justifyContent: msg.sender._id !== user._id ? 'flex-start' : 'flex-end' }}>
-                                    {
-                                        msg.messageType === "text" && (
+                                selectedChatType === "Group" && (
+                                    msg.isSystemMessage ? (
+                                        <div style={{display:'flex', justifyContent: 'center' }}>
+                                            <div style={{ backgroundColor: '#f0f0f0', padding: '6px 12px', borderRadius: '18px', fontSize: '12px', color: '#65676b', textAlign: 'center', maxWidth: '80%', wordBreak: 'break-word', fontStyle: 'italic' }}
+                                                dangerouslySetInnerHTML={{ __html: msg.content }}
+                                            />
+                                            {/* {
+                                                msg?.content?.split('<br/>').map((line, idx) => (
+                                                <p key={idx}>{line}</p>
+                                                ))
+                                            } */}
+                                            {/* </div> */}
+                                        </div>
+                                    ) : (
+                                        <div style={{display:'flex', justifyContent: msg.sender._id !== user._id ? 'flex-start' : 'flex-end' }}>
                                             <div style={{backgroundColor: msg.sender._id !== user._id ? "#FFFFFF" : "#D9FDD3", marginBottom: "8px" , maxWidth: "60%", padding: "10px", borderRadius: "10px", wordBreak: "break-word", boxShadow: "0px 2px 5px rgba(0,0,0,0.1)", position: "relative"}}>
                                                 <diV style={{fontSize: "14px", lineHeight: "1.5",}}>
                                                     {msg.content}
@@ -66,9 +76,9 @@ function Messages(){
                                                     {moment(msg.timestamp).format("LT")}
                                                 </div>
                                             </div>
-                                        )
-                                    }
-                                </div>
+                                        </div>
+                                    )
+                                )
                             }
                         </div>
                     )
