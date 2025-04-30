@@ -86,11 +86,11 @@ function MessagesContainer() {
                 (
                     <div style={{ marginTop:'1vh', marginLeft:'1vw', height:'100%', width:'100%', overflow:'hidden'}} >
 
-                        {
+                        {/* {
                             typingUser === selectedChatData?._id && (
                                 <p> typing...</p>
                             )
-                        }
+                        } */}
                         
                         {/*  chat headers for Individual and groups */}
                         {
@@ -122,7 +122,7 @@ function MessagesContainer() {
 
                         {/* messages displaying */}
                         <div style={{width:'95%', height:'65%'}}>
-                            <Messages selectedChatData = {selectedChatData}/>
+                            <Messages selectedChatData = {selectedChatData} typingUser={typingUser}/>
                         </div>
 
                         {/* messages sending box and its contents */}
