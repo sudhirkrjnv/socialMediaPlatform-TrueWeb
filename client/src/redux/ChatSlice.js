@@ -66,7 +66,7 @@ const chatSlice = createSlice({
                         name: otherUser.name,
                         profilePicture: otherUser.profilePicture,
                     }),
-                    lastMessage: message.message,
+                    lastMessage: message.content,
                     lastMessageTime: message.timestamp,
                 },
                 ...state.individualList.filter(chat => chat._id !== otherUser._id),
@@ -80,7 +80,7 @@ const chatSlice = createSlice({
             state.groupList = [
                 {
                     ...existingGroup,
-                    lastMessage: message.message,
+                    lastMessage: message.content,
                     lastMessageTime: message.timestamp,
                 },
                 ...state.groupList.filter(group => group._id !== message.groupId),
