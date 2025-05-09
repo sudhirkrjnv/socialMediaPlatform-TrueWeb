@@ -10,7 +10,7 @@ import { useEffect} from 'react';
 import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
 import { setSocket, setTypingData, setOnlineUsers} from './redux/socketSlice';
-import { addMessage,addGroupList, updateRecentIndividualChatList, updateRecentGroupChatList } from './redux/ChatSlice';
+import { addMessage,addGroupList, updateRecentIndividualChatList, updateRecentGroupChatList, setNotification, } from './redux/ChatSlice';
 
 const browserRouter = createBrowserRouter([
   {
@@ -46,6 +46,10 @@ const browserRouter = createBrowserRouter([
     const { user } = useSelector((store) => store.auth);
     const { socket } = useSelector((store) => store.socket);
     const dispatch = useDispatch();
+
+    const {notification} = useSelector(store => store.chat);
+    console.log("Notification", notification);
+    const { selectedChatData} = useSelector(store => store.chat);
   
   useEffect(() => {
     if (user) {
@@ -84,6 +88,31 @@ const browserRouter = createBrowserRouter([
       socketio.on('typing', (data) => {
         dispatch(setTypingData(data));
         setTimeout(()=>dispatch(setTypingData(null)), 2000);
+      });
+
+      socketio.on('getNotification', (data) => {
+        if (data.recipientId) {
+          const isCorrectIndividualChatOpen = 
+              selectedChatData?._id === data.senderId && 
+              !selectedChatData?.members;
+          
+          if (isCorrectIndividualChatOpen) {
+              dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
+          } else {
+              dispatch(setNotification(prev => [data, ...prev]));
+          }
+        }
+        else if (data.groupId) {
+            const isCorrectGroupChatOpen = 
+                selectedChatData?._id === data.groupId && 
+                selectedChatData?.members;
+            
+            if (isCorrectGroupChatOpen) {
+                dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
+            } else {
+                dispatch(setNotification(prev => [data, ...prev]));
+            }
+        }
       });
 
       return () => {

@@ -45,9 +45,11 @@ export const setupSocket = (server) => {
             io.emit('onlineUsers', getOnlineUsers());
         }
         
-        socket.on("sendMessage", async (message) => {
+        socket.on("sendMessage", async (message) => {   
             const messageData = await Message.create(message)
-                .then(m => m.populate("sender recipient", "username name profilePicture"));
+            .then(m => m.populate("sender recipient", "username name profilePicture"));
+            
+            console.log("Message Data:", messageData);
 
             [message.sender, message.recipient].forEach(userId => {
                 const socketIds = userSocketsMap.get(userId?.toString());
@@ -55,6 +57,19 @@ export const setupSocket = (server) => {
                     socketIds.forEach(sid => io.to(sid).emit("receiveMessage", messageData));
                 }
             });
+            
+            const recipientSocketIds = userSocketsMap.get(message.recipient?.toString());
+            if (recipientSocketIds) {
+                recipientSocketIds.forEach(sid => {
+                    io.to(sid).emit("getNotification", {
+                        senderId: message.sender,
+                        recipientId: message.recipient,
+                        isRead: false,
+                        date: new Date(),
+                        content: message.content || "New message"
+                    });
+                });
+            }
         });
 
         socket.on("newGroupCreated", ({ group, memberIds }) => {

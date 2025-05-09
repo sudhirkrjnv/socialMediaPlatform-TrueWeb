@@ -9,6 +9,7 @@ import axios from 'axios';
 import { toast } from 'material-react-toastify';
 import 'material-react-toastify/dist/ReactToastify.css';
 import {useSelector} from 'react-redux';
+import Notification from './Notification.jsx';
 
 function Sidebar(){
 
@@ -49,7 +50,7 @@ function Sidebar(){
     const sidebarItems = [
         {icon:<Home/>,text:"Home"}, 
         {icon:<MessageCircleMore/>,text:"Chat"}, 
-        {icon:<NotificationAddRounded/>,text:"Notification"}, 
+        {icon:<Notification/>,text:"Notification"},
         {icon:<Group/>,text:"Connection"}, 
         {icon:<OndemandVideo/>,text:"Media"},
         {icon:<Avatar style={{position:'relative', right:'0.5vw', top:'-0.8vh'}} src={shorts} sx={{width:40, height:40, "& img": {width: "60%",height: "60%",objectFit: "contain",opacity:'90%'},}}/>,text:<div style={{position:'relative', right:'1vw'}}>Shorts</div>}, 

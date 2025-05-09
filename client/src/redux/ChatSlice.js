@@ -8,6 +8,7 @@ const chatSlice = createSlice({
         selectedChatMessages: [],
         individualList: [],
         groupList: [],
+        notification: [],
     },
     reducers: {
         setSelectedChatType: (state, action) => {
@@ -24,6 +25,11 @@ const chatSlice = createSlice({
         },
         setGroupList: (state, action) => {
             state.groupList = action.payload;
+        },
+        setNotification: (state, action) => {
+            state.notification = typeof action.payload === 'function' 
+                ? action.payload(state.notification || [])
+                : action.payload;
         },
         addGroupList: (state, action) => {
             const groupExists = state.groupList.some(g => g._id === action.payload._id);
@@ -105,6 +111,7 @@ export const {
     addGroupList, 
     updateRecentIndividualChatList,
     updateRecentGroupChatList,
+    setNotification,
     closeChat,
 } = chatSlice.actions;
 

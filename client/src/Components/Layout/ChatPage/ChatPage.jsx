@@ -64,7 +64,7 @@ function ChatPage() {
         }))
         .filter(chat => chat.lastMessageTime)
         .sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
-    console.log(recentList);
+    //console.log(recentList);
     
     const filteredUsers = recentList
         .filter((u) => {
