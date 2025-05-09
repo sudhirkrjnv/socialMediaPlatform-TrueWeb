@@ -21,7 +21,7 @@ function Notification() {
                 </div>
                 {
                     unreadNotifications?.length === 0 ? null :
-                    <span style={{color:'red', position:'absolute', top:'-10%', left:'100%', backgroundColor:'red', color:'white', borderRadius: '50%', minWidth: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', padding: '2px'}}>
+                    <span style={{position:'absolute', top:'-10%', left:'100%', backgroundColor:'red', color:'white', borderRadius: '50%', minWidth: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', padding: '2px'}}>
                         {unreadNotifications?.length}
                     </span>
                 }

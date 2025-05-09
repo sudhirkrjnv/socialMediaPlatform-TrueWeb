@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData, setIndividualList, setSelectedChatMessages, setGroupList } from '../../../redux/ChatSlice.js';
+import { setSelectedChatType, setSelectedChatData, setIndividualList, setSelectedChatMessages, setGroupList, markChatListNotificationsAsRead} from '../../../redux/ChatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import {AddCommentOutlined, MoreVertOutlined, Group} from '@mui/icons-material';
@@ -19,6 +19,13 @@ function ChatPage() {
     const {individualList, selectedChatData, groupList} = useSelector(store => store.chat);
     const { onlineUsers } = useSelector(store => store.socket);
     const [searchQuery, setSearchQuery] = useState("");
+
+    const {notification} = useSelector(store => store.chat);
+
+    const getUnreadNotification = (notification)=>{
+        return notification.filter((n)=>n.isRead === false)
+    }
+    const unreadNotifications = getUnreadNotification(notification);
 
     useEffect(() => {
         const fetchRecentChats = async () => {
@@ -41,9 +48,8 @@ function ChatPage() {
 
 
     const handleSelectedItem = (item) => {
-
-        const isGroupChat = groupList.some(group => group._id === item._id);
         
+        const isGroupChat = groupList.some(group => group._id === item._id);
         if(isGroupChat){
             dispatch(setSelectedChatType("Group"));
         } else {
@@ -52,8 +58,24 @@ function ChatPage() {
         
         dispatch(setSelectedChatData(item));
         
+        
         if(selectedChatData && selectedChatData._id !== item._id){
             dispatch(setSelectedChatMessages([]));
+        }
+        
+        const chatListNotifications = unreadNotifications.filter((n) => {
+            if (!item.members) {
+                return n.senderId === item._id;
+            } else {
+                return n.chatId === item._id;
+            }
+        });
+    
+        if (chatListNotifications.length > 0) {
+            dispatch(markChatListNotificationsAsRead({
+                chatId: isGroupChat ? item._id : undefined,
+                senderId: !isGroupChat ? item._id : undefined
+            }));
         }
     };
 
@@ -106,33 +128,59 @@ function ChatPage() {
                         <h4 style={{ marginLeft: '1vw', marginTop: '2vh' }}>Recent Chats</h4>
                         {
                             (searchQuery ? filteredUsers : recentList).length > 0 ? (
-                                (searchQuery ? filteredUsers : recentList).map((chat) => (
-                                    <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>
-                                        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
-                                            <div style={{display:'flex', alignItems:'center'}}>
-                                                <Avatar src={chat.profilePicture || "/broken-image.jpg"} sx={{ width: 40, height: 40 }}>
-                                                    {chat.members ? <Group /> : null}
-                                                </Avatar>
-                                                <div style={{ paddingLeft: '0.5rem' }}>
-                                                    <div><strong>{chat.name}</strong></div>
-                                                    { chat.username && <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>}
+                                (searchQuery ? filteredUsers : recentList).map((chat) => {
+
+                                    // for unread message notification is filtered as per each chat
+                                    const chatListNotifications = unreadNotifications.filter((n) => {
+                                        if (!chat.members) {
+                                            return n.senderId === chat._id;
+                                        } else {
+                                            return n.chatId === chat._id;
+                                        }
+                                    });
+
+                                    return(
+                                        <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>
+                                            <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', height:'100%', width:'100%'}}>
+                                                <div style={{display:'flex', alignItems:'center'}}>
+                                                    <Avatar src={chat.profilePicture || "/broken-image.jpg"} sx={{ width: 40, height: 40 }}>
+                                                        {chat.members ? <Group /> : null}
+                                                    </Avatar>
+                                                    <div style={{ paddingLeft: '0.5rem' }}>
+                                                        <div><strong>{chat.name}</strong></div>
+                                                        { chat.username && <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>}
+                                                    </div>
+                                                </div>
+                                                <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
+                                                    <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
+
+                                                    {/* unread messages notification for each chat */}
+                                                    {
+                                                        chatListNotifications?.length > 0
+                                                        ? (
+                                                            <div style={{backgroundColor:'green', color:'white', borderRadius: '50%', minWidth: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', padding: '2px'}}>
+                                                                {chatListNotifications?.length}
+                                                            </div>
+                                                        )
+                                                        : " "
+                                                    }
+                                                        
+                                                    {/* add here for green if online , red for online  */}
+                                                    {
+                                                        !chat.members && (
+                                                            <div style={{fontSize:'8px'}}>
+                                                                {onlineUsers.includes(chat._id) ? '🟢' : '🔴'}
+                                                            </div>
+                                                        )
+                                                    }
+                                                    
                                                 </div>
                                             </div>
-                                            <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
-                                                <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
-                                                {/* add here for green if online , red for online  */}
-                                                {
-                                                    !chat.members && (
-                                                        <div style={{fontSize:'8px'}}>
-                                                            {onlineUsers.includes(chat._id) ? '🟢' : '🔴'}
-                                                        </div>
-                                                    )
-                                                }
-                                            </div>
+                                            
                                         </div>
-                                        
-                                    </div>
-                                ))
+                                    )
+                                }
+                                )
                             ) : (
                                 <div style={{ height: '40vh', width: '80%', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'red', fontWeight: 'bolder' }}>
                                     <div>Recents Chat is Empty</div>

@@ -31,6 +31,16 @@ const chatSlice = createSlice({
                 ? action.payload(state.notification || [])
                 : action.payload;
         },
+        markChatListNotificationsAsRead: (state, action) => {
+            const { chatId, senderId } = action.payload;
+
+            state.notification = state.notification.map(n => {
+                if ((chatId && n.chatId === chatId) || (senderId && n.senderId === senderId)) {
+                    return { ...n, isRead: true };
+                }
+                return n;
+            });
+        },
         addGroupList: (state, action) => {
             const groupExists = state.groupList.some(g => g._id === action.payload._id);
             if (!groupExists) {
@@ -112,6 +122,7 @@ export const {
     updateRecentIndividualChatList,
     updateRecentGroupChatList,
     setNotification,
+    markChatListNotificationsAsRead,
     closeChat,
 } = chatSlice.actions;
 
