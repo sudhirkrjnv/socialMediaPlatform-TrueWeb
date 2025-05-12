@@ -32,10 +32,10 @@ const chatSlice = createSlice({
                 : action.payload;
         },
         markChatListNotificationsAsRead: (state, action) => {
-            const { chatId, senderId } = action.payload;
+            const { groupId, senderId } = action.payload;
 
             state.notification = state.notification.map(n => {
-                if ((chatId && n.chatId === chatId) || (senderId && n.senderId === senderId)) {
+                if ((groupId && n.groupId === groupId) || (senderId && n.senderId === senderId)) {
                     return { ...n, isRead: true };
                 }
                 return n;

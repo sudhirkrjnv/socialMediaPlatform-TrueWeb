@@ -26,6 +26,7 @@ function ChatPage() {
         return notification.filter((n)=>n.isRead === false)
     }
     const unreadNotifications = getUnreadNotification(notification);
+    console.log(unreadNotifications);
 
     useEffect(() => {
         const fetchRecentChats = async () => {
@@ -67,13 +68,13 @@ function ChatPage() {
             if (!item.members) {
                 return n.senderId === item._id;
             } else {
-                return n.chatId === item._id;
+                return n.groupId === item._id;
             }
         });
     
         if (chatListNotifications.length > 0) {
             dispatch(markChatListNotificationsAsRead({
-                chatId: isGroupChat ? item._id : undefined,
+                groupId: isGroupChat ? item._id : undefined,
                 senderId: !isGroupChat ? item._id : undefined
             }));
         }
@@ -130,14 +131,17 @@ function ChatPage() {
                             (searchQuery ? filteredUsers : recentList).length > 0 ? (
                                 (searchQuery ? filteredUsers : recentList).map((chat) => {
 
+                                    console.log("chat", chat);
+
                                     // for unread message notification is filtered as per each chat
                                     const chatListNotifications = unreadNotifications.filter((n) => {
                                         if (!chat.members) {
                                             return n.senderId === chat._id;
                                         } else {
-                                            return n.chatId === chat._id;
+                                            return n.groupId === chat._id;
                                         }
                                     });
+                                    //console.log("chatListNotifications", chatListNotifications);
 
                                     return(
                                         <div onClick={() => handleSelectedItem(chat)} key={chat._id} style={{ backgroundColor: selectedChatData && selectedChatData._id === chat._id ? "rgb(223, 229, 237)" : "#F0F2F5" ,display: 'flex', marginTop: '1vh', marginLeft: '1vw', cursor: 'pointer', padding:'10px', borderRadius:'10px' }}>

@@ -106,7 +106,18 @@ export const setupSocket = (server) => {
             [...group.members, group.admin].forEach(member => {
                 const socketIds = userSocketsMap.get(member._id.toString());
                 if (socketIds) {
-                    socketIds.forEach(sid => io.to(sid).emit("receive_Group_Message", { ...messageData._doc, groupId: group._id, timestamp: messageData.timestamp }));
+                    socketIds.forEach(sid =>{
+                        io.to(sid).emit("receive_Group_Message", { ...messageData._doc, groupId: group._id, timestamp: messageData.timestamp });
+                        if (member._id.toString() !== message.sender.toString()) {
+                            io.to(sid).emit("getNotification", {
+                                groupId: group._id,
+                                isRead: false,
+                                date: new Date(),
+                                content: message.content || "New group message",
+                                type: "group"
+                            });
+                        }
+                    }) 
                 }
             });
         });
