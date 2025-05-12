@@ -89,11 +89,19 @@ function ChatPage() {
         .sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
     //console.log(recentList);
     
-    const filteredUsers = recentList
-        .filter((u) => {
-            const nameToSearch = u.username || u.name || "";
-            return nameToSearch.toLowerCase().includes(searchQuery.toLowerCase());
-        });
+    const filteredUsers = recentList.filter((u) => {
+        const nameToSearch = u.username || u.name || "";
+        return nameToSearch.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+
+    const truncateText = (text)=>{
+        let shortText = text.substring(0,50);
+        if(text.length > 20){
+            shortText = shortText + ".............."
+        }
+        return shortText;
+    }
+    
 
     return (
         <>
@@ -153,10 +161,17 @@ function ChatPage() {
                                                     <div style={{ paddingLeft: '0.5rem' }}>
                                                         <div><strong>{chat.name}</strong></div>
                                                         { chat.username && <div style={{ color: '#1f1f1f', fontSize: '12px' }}>@{chat.username}</div>}
+                                                        <div style={{fontSize:'10px', opacity:'60%'}}>
+                                                            {
+                                                                chat.lastMessage && (
+                                                                    truncateText(chat.lastMessage)
+                                                                )
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
-                                                    <div style={{ fontSize: '10px', color: 'gray' }}>Last Message: {new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
+                                                    <div style={{ fontSize: '10px', color: 'gray' }}>{new Date(chat.lastMessageTime).toLocaleTimeString()}</div> 
 
                                                     {/* unread messages notification for each chat */}
                                                     {
