@@ -49,18 +49,26 @@ export const setupSocket = (server) => {
             const messageData = await Message.create(message)
             .then(m => m.populate("sender recipient", "username name profilePicture"));
             
-            console.log("Message Data:", messageData);
+            //console.log("Message Data:", messageData);
 
-            [message.sender, message.recipient].forEach(userId => {
-                const socketIds = userSocketsMap.get(userId?.toString());
-                if (socketIds) {
-                    socketIds.forEach(sid => io.to(sid).emit("receiveMessage", messageData));
-                }
-            });
-            
+            const senderSocketIds = userSocketsMap.get(message.sender?.toString());
+            if (senderSocketIds) {
+                senderSocketIds.forEach(sid => io.to(sid).emit("receiveMessage", {
+                    ...messageData._doc, 
+                    status: 'sent'
+                }));
+            }
+
             const recipientSocketIds = userSocketsMap.get(message.recipient?.toString());
             if (recipientSocketIds) {
+
+                await Message.findByIdAndUpdate(messageData._id, { status: 'delivered' });
+
                 recipientSocketIds.forEach(sid => {
+                    io.to(sid).emit("receiveMessage", {
+                        ...messageData._doc,
+                        status: 'delivered'
+                    })
                     io.to(sid).emit("getNotification", {
                         senderId: message.sender,
                         recipientId: message.recipient,
@@ -69,6 +77,28 @@ export const setupSocket = (server) => {
                         content: message.content || "New message"
                     });
                 });
+                if(senderSocketIds){
+                    senderSocketIds.forEach(sid=>io.to(sid).emit("messageStatusUpdate", {
+                        messageId: messageData._id,
+                        status: 'delivered'
+                    }))
+                }
+            }
+            
+        });
+
+        socket.on("messageRead", async ({ messageId, readerId }) => {
+            const message = await Message.findById(messageId);
+            if (!message) return;
+
+            await Message.findByIdAndUpdate(messageId, { status: 'read' });
+
+            const senderSocketIds = userSocketsMap.get(message.sender?.toString());
+            if (senderSocketIds) {
+                senderSocketIds.forEach(sid => io.to(sid).emit("messageStatusUpdate", {
+                    messageId,
+                    status: 'read'
+                }));
             }
         });
 

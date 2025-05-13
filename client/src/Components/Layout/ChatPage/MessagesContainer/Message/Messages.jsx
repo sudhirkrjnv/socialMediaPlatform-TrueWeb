@@ -8,6 +8,7 @@ function Messages({typingData}){
 
     const { selectedChatType, selectedChatData, selectedChatMessages } = useSelector((store) => store.chat);
     const {user} = useSelector(store=>store.auth);
+    const {socket} = useSelector(store=>store.socket);
 
     const scrollRef = useRef();
     const messagesContainerRef = useRef();
@@ -23,6 +24,45 @@ function Messages({typingData}){
     }, [selectedChatMessages, typingData]);
 
 
+    useEffect(() => {
+        
+        if (!socket) return;
+        
+        if (selectedChatType === "Individual" && selectedChatData && selectedChatMessages.length > 0) {
+            const unreadMessages = selectedChatMessages.filter(
+                msg => msg.sender === selectedChatData._id && msg.status !== 'read'
+            );
+            
+            if (unreadMessages.length > 0) {
+                unreadMessages.forEach(msg => {
+                    try {
+                        socket.emit("messageRead", { 
+                            messageId: msg._id, 
+                            readerId: user._id 
+                        });
+                    } catch (error) {
+                        console.error("Error emitting messageRead:", error);
+                    }
+                });
+            }
+        }
+    }, [selectedChatMessages, selectedChatData, selectedChatType, user._id, socket]);
+
+    const renderMessageStatus = (status, isSender) => {
+        if (!isSender) return null;
+        
+        switch(status) {
+            case 'sent':
+                return <span style={{ marginLeft: '5px' }}><b>✓</b></span>;
+            case 'delivered':
+                return <span style={{ marginLeft: '5px' }}><b>✓✓</b></span>;
+            case 'read':
+                return <span style={{ marginLeft: '5px', color: '#4fc3f7' }}><b>✓✓</b></span>;
+            default:
+                return <span style={{ marginLeft: '5px', opacity: 0.5 }}>🕒</span>;
+        }
+    };
+
     return (
         <>
         <div ref={messagesContainerRef} className="messagesContainer" style={{height:'100%', width:'100%', overflowY:'scroll', scrollBehavior:'smooth' }}>
@@ -31,6 +71,11 @@ function Messages({typingData}){
                     const msgDate = moment(msg.timestamp).format("YYYY-MM-DD");
                     const showDate = msgDate !== lastdate;
                     lastdate = msgDate;
+
+                    const isSender = selectedChatType === "Individual"
+                        ? msg.sender === user._id
+                        : msg.sender._id === user._id;
+
                     return(
                         <div key={index}>
                             { showDate && <div style={{textAlign:'center', marginBottom:'10px', fontSize:'12px', color: "#666"}}>{moment(msg.timestamp).format("LL")}</div> }
@@ -44,8 +89,9 @@ function Messages({typingData}){
                                                 <div style={{fontSize: "14px", lineHeight: "1.5",}}>
                                                     {msg.content}
                                                 </div>
-                                                <div style={{ fontSize: "10px", color: "#666", textAlign: "right", marginTop: "5px"}}>
+                                                <div style={{display:'flex', justifyContent:'center', alignItems:'center', fontSize: "10px", color: "#666", textAlign: "right", marginTop: "5px"}}>
                                                     {moment(msg.timestamp).format("LT")}
+                                                    {renderMessageStatus(msg.status, isSender)}
                                                 </div>
                                             </div>
                                         )

@@ -9,6 +9,7 @@ const messageSchema = new mongoose.Schema(
         content: { type:String, required:function(){return this.messageType === "text"} },
         fileUrl: { type:String, required:function(){return this.messageType === "file"} },
         isSystemMessage: { type: Boolean, default: false },
+        status: { type: String, enum: ['sent', 'delivered', 'read'], default: 'sent'},
         timestamp: { type:Date, default:Date.now }
     }
 )

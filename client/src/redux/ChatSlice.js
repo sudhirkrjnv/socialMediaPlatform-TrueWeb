@@ -69,6 +69,15 @@ const chatSlice = createSlice({
                 });
             }
         },
+        updateMessageStatus: (state, action) => {
+            const { messageId, status } = action.payload;
+            state.selectedChatMessages = state.selectedChatMessages.map(msg => {
+                if (msg._id === messageId) {
+                    return { ...msg, status };
+                }
+                return msg;
+            });
+        },
             
         updateRecentIndividualChatList: (state, { payload: { message, currentUserId } }) => {
             const otherUser = message.sender._id === currentUserId ? message.recipient : message.sender;
@@ -114,7 +123,8 @@ const chatSlice = createSlice({
 export const { 
     setSelectedChatType,
     setSelectedChatData, 
-    addMessage, 
+    addMessage,
+    updateMessageStatus, 
     setSelectedChatMessages,
     setIndividualList, 
     setGroupList, 
