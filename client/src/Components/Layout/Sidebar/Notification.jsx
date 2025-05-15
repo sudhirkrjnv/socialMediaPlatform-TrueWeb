@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import {NotificationAddRounded} from '@mui/icons-material';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import { markAllNotificationsAsRead} from '../../../redux/ChatSlice.js';
 
 function Notification() {
     const [open, setOpen] = useState(false);
     const {notification} = useSelector(store => store.chat);
+
+    const dispatch = useDispatch();
 
     const getUnreadNotification = (notification)=>{
         return notification.filter((n)=>n.isRead === false)
@@ -35,7 +38,7 @@ function Notification() {
                     open && (
                         <div style={{display:'flex', gap:'10px'}}>
                             <div>Notifications</div>
-                            <div>Mark as Read</div>
+                            <div onClick={() => dispatch(markAllNotificationsAsRead())}>Mark as Read</div>
                         </div>
                     )
                 }

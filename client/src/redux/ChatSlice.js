@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { useCallback } from 'react';
 
 const chatSlice = createSlice({
     name: 'chat',
@@ -40,6 +41,12 @@ const chatSlice = createSlice({
                 }
                 return n;
             });
+        },
+        markAllNotificationsAsRead: (state) => {
+            state.notification = state.notification.map(n => ({
+                ...n,
+                isRead: true,
+            }));
         },
         addGroupList: (state, action) => {
             const groupExists = state.groupList.some(g => g._id === action.payload._id);
@@ -133,6 +140,7 @@ export const {
     updateRecentGroupChatList,
     setNotification,
     markChatListNotificationsAsRead,
+    markAllNotificationsAsRead,
     closeChat,
 } = chatSlice.actions;
 
