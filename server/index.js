@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import userRoute from "./routes/user.routes.js";
 import postRoute from "./routes/post.routes.js";
 import messageRoute from "./routes/message.routes.js";
+import notificationRoute from "./routes/notification.routes.js"
 import cookieParser from "cookie-parser";
 import { setupSocket } from "./socket.js";
 dotenv.config({});
@@ -34,6 +35,7 @@ app.use(cors({
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 app.use("/api/v1/message", messageRoute);
+app.use("api/v1/notifications", notificationRoute);
 
 
 const server = app.listen(PORT, ()=>{
