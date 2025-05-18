@@ -2,6 +2,7 @@ import { Server } from 'socket.io';
 import { Message } from './models/message.models.js';
 import {Group} from './models/group.model.js'
 import { User } from './models/user.model.js'
+import { Notification } from './models/notification.model.js'
 
 export const setupSocket = (server) => {
     
@@ -48,6 +49,13 @@ export const setupSocket = (server) => {
         socket.on("sendMessage", async (message) => {   
             const messageData = await Message.create(message)
             .then(m => m.populate("sender recipient", "username name profilePicture"));
+            const notificationData = await Notification.create({
+                senderId: message.sender,
+                recipientId: message.recipient,
+                isRead: false,
+                date: new Date(),
+                content: message.content || "New message"
+            })
             
             //console.log("Message Data:", messageData);
 
@@ -69,13 +77,7 @@ export const setupSocket = (server) => {
                         ...messageData._doc,
                         status: 'delivered'
                     })
-                    io.to(sid).emit("getNotification", {
-                        senderId: message.sender,
-                        recipientId: message.recipient,
-                        isRead: false,
-                        date: new Date(),
-                        content: message.content || "New message"
-                    });
+                    io.to(sid).emit("getNotification", notificationData);
                 });
                 if(senderSocketIds){
                     senderSocketIds.forEach(sid=>io.to(sid).emit("messageStatusUpdate", {
@@ -131,6 +133,14 @@ export const setupSocket = (server) => {
                 { new: true, populate: "members admin" }
             );
 
+            const notificationData = Notification.create({
+                groupId: group._id,
+                isRead: false,
+                date: new Date(),
+                content: message.content || "New group message",
+                type: "group"
+            })
+
             if (!group) return;
 
             [...group.members, group.admin].forEach(member => {
@@ -139,13 +149,7 @@ export const setupSocket = (server) => {
                     socketIds.forEach(sid =>{
                         io.to(sid).emit("receive_Group_Message", { ...messageData._doc, groupId: group._id, timestamp: messageData.timestamp });
                         if (member._id.toString() !== message.sender.toString()) {
-                            io.to(sid).emit("getNotification", {
-                                groupId: group._id,
-                                isRead: false,
-                                date: new Date(),
-                                content: message.content || "New group message",
-                                type: "group"
-                            });
+                            io.to(sid).emit("getNotification", notificationData);
                         }
                     }) 
                 }
