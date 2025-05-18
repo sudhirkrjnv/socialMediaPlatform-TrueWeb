@@ -35,7 +35,7 @@ app.use(cors({
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 app.use("/api/v1/message", messageRoute);
-app.use("api/v1/notifications", notificationRoute);
+app.use("/api/v1/notifications", notificationRoute);
 
 
 const server = app.listen(PORT, ()=>{
