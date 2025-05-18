@@ -1,15 +1,19 @@
-import { Notification } from "../models/notification.model";
+import { Notification } from "../models/notification.model.js"
 
 export const getNotification = async (req, res) => {
     try {
         const notifications = await Notification.find({
-            recipientId: req.user._id
+            recipient: req._id
         })
         .sort({ createdAt: -1 })
         .limit(50)
         .populate('senderId', 'name profilePicture');
 
-        res.json({ notifications });
+        return res.status(200).json({
+            success: true, 
+            notifications 
+        });
+
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch notifications" });
     }
