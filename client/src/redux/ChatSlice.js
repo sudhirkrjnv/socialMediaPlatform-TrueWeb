@@ -148,7 +148,7 @@ export const loadNotifications = () => async (dispatch) => {
 
 export const markNotificationAsRead = (notificationIds) => async (dispatch) => {
   try {
-    dispatch(chatSlice.actions._markNotificationAsRead({ notificationIds }));
+    dispatch(_markNotificationAsRead({ notificationIds }));
     await markSingle(notificationIds);
   } catch (error) {
     console.error("Error marking notifications as read:", error);
@@ -157,7 +157,7 @@ export const markNotificationAsRead = (notificationIds) => async (dispatch) => {
 
 export const markChatListNotificationAsRead = ({ groupId, senderId }) => async (dispatch) => {
   try {
-    dispatch(chatSlice.actions._markChatListNotificationsAsRead({ groupId, senderId }));
+    dispatch(_markChatListNotificationsAsRead({ groupId, senderId }));
     await markMultiple({ groupId, senderId });
   } catch (error) {
     console.error("Error in markChatListNotifications:", error);
@@ -166,7 +166,7 @@ export const markChatListNotificationAsRead = ({ groupId, senderId }) => async (
 
 export const markAllNotificationAsRead = () => async (dispatch) => {
   try {
-    dispatch(chatSlice.actions._markAllNotificationsAsRead());
+    dispatch(_markAllNotificationsAsRead());
     await markAll();
   } catch (error) {
     console.error("Error in markAllNotifications:", error);
