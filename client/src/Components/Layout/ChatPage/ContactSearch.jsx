@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData} from '../../../redux/ChatSlice.js';
+import { setSelectedChatType, setSelectedChatData} from '../../../redux/chatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import axios from 'axios';

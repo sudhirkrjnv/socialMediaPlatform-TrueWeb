@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData, setIndividualList, setSelectedChatMessages, setGroupList, markChatListNotificationsAsRead} from '../../../redux/ChatSlice.js';
+import { setSelectedChatType, setSelectedChatData, setIndividualList, setSelectedChatMessages, setGroupList, markChatListNotificationAsRead} from '../../../redux/chatSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import {AddCommentOutlined, MoreVertOutlined, Group} from '@mui/icons-material';
@@ -73,7 +73,7 @@ function ChatPage() {
         });
     
         if (chatListNotifications.length > 0) {
-            dispatch(markChatListNotificationsAsRead({
+            dispatch(markChatListNotificationAsRead({
                 groupId: isGroupChat ? item._id : undefined,
                 senderId: !isGroupChat ? item._id : undefined
             }));

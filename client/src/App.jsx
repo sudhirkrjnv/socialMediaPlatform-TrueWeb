@@ -10,7 +10,7 @@ import { useEffect} from 'react';
 import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
 import { setSocket, setTypingData, setOnlineUsers} from './redux/socketSlice';
-import { addMessage, updateMessageStatus, addGroupList, updateRecentIndividualChatList, updateRecentGroupChatList, setNotification, } from './redux/ChatSlice';
+import { addMessage, updateMessageStatus, addGroupList, updateRecentIndividualChatList, updateRecentGroupChatList, loadNotifications, setNotification, markNotificationAsRead, markChatListNotificationAsRead, markAllNotificationAsRead } from './redux/chatSlice';
 
 const browserRouter = createBrowserRouter([
   {
@@ -54,15 +54,17 @@ const browserRouter = createBrowserRouter([
   useEffect(() => {
     if (user) {
       const socketio = io('http://localhost:8000', {
-            withCredentials: true,
-            query: { userId: user?._id },
-            transports: ['websocket'],
-          });
+          withCredentials: true,
+          query: { userId: user?._id },
+          transports: ['websocket'],
+      });
       dispatch(setSocket(socketio));
           
       socketio.on('connect', () => {
         console.log('Connected to socket server');
       });
+          
+      dispatch(loadNotifications());
 
       socketio.on('receiveMessage', (message) => {
         dispatch(addMessage(message));
@@ -94,29 +96,54 @@ const browserRouter = createBrowserRouter([
         setTimeout(()=>dispatch(setTypingData(null)), 2000);
       });
 
-      socketio.on('getNotification', (data) => {
-        if (data.recipientId) {
-          const isCorrectIndividualChatOpen = 
-              selectedChatData?._id === data.senderId && 
-              !selectedChatData?.members;
+      // socketio.on('getNotification', (data) => {
+      //   if (data.recipientId) {
+      //     const isCorrectIndividualChatOpen = 
+      //         selectedChatData?._id === data.senderId && 
+      //         !selectedChatData?.members;
           
-          if (isCorrectIndividualChatOpen) {
-              dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
-          } else {
-              dispatch(setNotification(prev => [data, ...prev]));
-          }
-        }
-        else if (data.groupId) {
-            const isCorrectGroupChatOpen = 
-                selectedChatData?._id === data.groupId && 
-                selectedChatData?.members;
+      //     if (isCorrectIndividualChatOpen) {
+      //         dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
+      //     } else {
+      //         dispatch(setNotification(prev => [data, ...prev]));
+      //     }
+      //   }
+      //   else if (data.groupId) {
+      //       const isCorrectGroupChatOpen = 
+      //           selectedChatData?._id === data.groupId && 
+      //           selectedChatData?.members;
             
-            if (isCorrectGroupChatOpen) {
-                dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
-            } else {
-                dispatch(setNotification(prev => [data, ...prev]));
-            }
-        }
+      //       if (isCorrectGroupChatOpen) {
+      //           dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
+      //       } else {
+      //           dispatch(setNotification(prev => [data, ...prev]));
+      //       }
+      //   }
+      // });
+
+    
+      socketio.on('getNotification', (notification) => {
+        const shouldMarkAsRead = 
+          (notification.senderId && selectedChatData?._id === notification.senderId && !selectedChatData?.members) ||
+          (notification.groupId && selectedChatData?._id === notification.groupId && selectedChatData?.members);
+        
+        dispatch(setNotification(prev => 
+          [ { ...notification, isRead: shouldMarkAsRead }, ...prev ]
+        ));
+
+      });
+
+
+      socketio.on('notificationsRead', ({ notificationIds }) => {
+        dispatch(markNotificationAsRead({ notificationIds }));
+      });
+
+      socketio.on('chatListNotificationsRead', ({ groupId, senderId }) => {
+        dispatch(markChatListNotificationAsRead({ groupId, senderId }));
+      });
+
+      socketio.on('allNotificationsRead', () => {
+        dispatch(markAllNotificationAsRead());
       });
 
       return () => {

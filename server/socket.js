@@ -104,6 +104,68 @@ export const setupSocket = (server) => {
             }
         });
 
+        socket.on("markNotificationsAsRead", async ({ notificationIds, userId }) => {
+            try {
+                await Notification.updateMany(
+                    { _id: { $in: notificationIds } },
+                    { $set: { isRead: true } }
+                );
+
+                const userSocketIds = userSocketsMap.get(userId?.toString());
+                if (userSocketIds) {
+                    userSocketIds.forEach(sid => {
+                        io.to(sid).emit("notificationsRead", { notificationIds });
+                    });
+                }
+            } catch (error) {
+                console.error("Error marking notifications as read:", error);
+            }
+        });
+
+        socket.on('markChatListNotificationsAsRead', async ({ groupId, senderId, userId }) => {
+            try {
+                let updateQuery = { recipientId: userId, isRead: false };
+                if (groupId) updateQuery.groupId = groupId;
+                if (senderId) updateQuery.senderId = senderId;
+
+                const { modifiedCount } = await Notification.updateMany(
+                    updateQuery,
+                    { $set: { isRead: true } }
+                );
+
+                if (modifiedCount > 0) {
+                    const userSocketIds = userSocketsMap.get(userId);
+                    if (userSocketIds) {
+                        userSocketIds.forEach(sid => {
+                            io.to(sid).emit('chatListNotificationsRead', { groupId, senderId });
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error marking chat list notifications:', error);
+            }
+        });
+
+        socket.on('markAllNotificationsAsRead', async (userId) => {
+            try {
+                const { modifiedCount } = await Notification.updateMany(
+                    { recipientId: userId, isRead: false },
+                    { $set: { isRead: true } }
+                );
+
+                if (modifiedCount > 0) {
+                    const userSocketIds = userSocketsMap.get(userId);
+                    if (userSocketIds) {
+                        userSocketIds.forEach(sid => {
+                            io.to(sid).emit('allNotificationsRead');
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error marking all notifications as read:', error);
+            }
+        });
+
         socket.on("newGroupCreated", ({ group, memberIds }) => {
             memberIds.forEach(userId => {
                 const socketIds = userSocketsMap.get(userId?.toString());

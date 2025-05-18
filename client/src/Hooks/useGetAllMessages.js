@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedChatMessages } from '../redux/ChatSlice';
+import { setSelectedChatMessages } from '../redux/chatSlice';
 
 const useGetAllMessages = () => {
     const { selectedChatType, selectedChatData } = useSelector((store) => store.chat);

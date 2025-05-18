@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { useCallback } from 'react';
+import { fetchNotifications, markNotificationsAsRead as markSingle, markChatListNotificationsAsRead as markMultiple, markAllNotificationsAsRead as markAll } from '@/middleware/notification.middleware.js';
 
 const chatSlice = createSlice({
     name: 'chat',
@@ -32,7 +32,7 @@ const chatSlice = createSlice({
                 ? action.payload(state.notification || [])
                 : action.payload;
         },
-        markChatListNotificationsAsRead: (state, action) => {
+        _markChatListNotificationsAsRead: (state, action) => {
             const { groupId, senderId } = action.payload;
 
             state.notification = state.notification.map(n => {
@@ -42,7 +42,16 @@ const chatSlice = createSlice({
                 return n;
             });
         },
-        markAllNotificationsAsRead: (state) => {
+        _markNotificationAsRead: (state, action) => {
+            const { notificationIds } = action.payload;
+
+            state.notification = state.notification.map(n => 
+                notificationIds.includes(n._id)
+                    ? { ...n, isRead: true }
+                    : n
+            );
+        },
+        _markAllNotificationsAsRead: (state) => {
             state.notification = state.notification.map(n => ({
                 ...n,
                 isRead: true,
@@ -127,6 +136,43 @@ const chatSlice = createSlice({
     },
 });
 
+// Thunk Actions
+export const loadNotifications = () => async (dispatch) => {
+  try {
+    const notifications = await fetchNotifications();
+    dispatch(chatSlice.actions.setNotification(notifications));
+  } catch (error) {
+    console.error("Error loading notifications:", error);
+  }
+};
+
+export const markNotificationAsRead = (notificationIds) => async (dispatch) => {
+  try {
+    dispatch(chatSlice.actions._markNotificationAsRead({ notificationIds }));
+    await markSingle(notificationIds);
+  } catch (error) {
+    console.error("Error marking notifications as read:", error);
+  }
+};
+
+export const markChatListNotificationAsRead = ({ groupId, senderId }) => async (dispatch) => {
+  try {
+    dispatch(chatSlice.actions._markChatListNotificationsAsRead({ groupId, senderId }));
+    await markMultiple({ groupId, senderId });
+  } catch (error) {
+    console.error("Error in markChatListNotifications:", error);
+  }
+};
+
+export const markAllNotificationAsRead = () => async (dispatch) => {
+  try {
+    dispatch(chatSlice.actions._markAllNotificationsAsRead());
+    await markAll();
+  } catch (error) {
+    console.error("Error in markAllNotifications:", error);
+  }
+};
+
 export const { 
     setSelectedChatType,
     setSelectedChatData, 
@@ -139,8 +185,9 @@ export const {
     updateRecentIndividualChatList,
     updateRecentGroupChatList,
     setNotification,
-    markChatListNotificationsAsRead,
-    markAllNotificationsAsRead,
+    _markNotificationAsRead,
+    _markChatListNotificationAsRead,
+    _markAllNotificationsAsRead,
     closeChat,
 } = chatSlice.actions;
 
