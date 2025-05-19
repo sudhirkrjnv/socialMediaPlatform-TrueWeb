@@ -195,19 +195,19 @@ export const setupSocket = (server) => {
                 { new: true, populate: "members admin" }
             );
 
-            const notificationData = await Notification.create({
-                groupId: group._id,
-                isRead: false,
-                date: new Date(),
-                content: message.content || "New group message",
-                type: "group"
-            })
-
             if (!group) return;
 
-            [...group.members, group.admin].forEach(member => {
+            [...group.members, group.admin].forEach(async(member) => {
                 const socketIds = userSocketsMap.get(member._id.toString());
                 if (socketIds) {
+                    const notificationData = await Notification.create({
+                        groupId: group._id,
+                        recipientId: member._id,
+                        isRead: false,
+                        date: new Date(),
+                        content: message.content || "New group message",
+                        type: "group"
+                    })
                     socketIds.forEach(sid =>{
                         io.to(sid).emit("receive_Group_Message", { ...messageData._doc, groupId: group._id, timestamp: messageData.timestamp });
                         if (member._id.toString() !== message.sender.toString()) {

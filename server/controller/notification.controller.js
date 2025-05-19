@@ -1,22 +1,29 @@
 import { Notification } from "../models/notification.model.js"
 
-export const getNotification = async (req, res) => {
+export const fetchNotification = async (req, res) => {
     try {
         const notifications = await Notification.find({
-            recipient: req._id
+            recipientId: req.id
         })
         .sort({ createdAt: -1 })
         .limit(50)
-        .populate('sender', 'name profilePicture');
+        .populate('senderId', 'name username profilePicture');
+
+        if (!notifications || notifications.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: "No any notification found ! ",
+                notifications: []
+            });
+        }
 
         return res.status(200).json({
-            success: true, 
-            notifications 
+            success: true,
+            notifications
         });
 
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch notifications" });
-        console.log("failed to get notification")
+        console.error("Failed to fetch notifications", error)
     }
 };
   
@@ -55,29 +62,6 @@ export const markChatListRead = async (req, res) => {
         console.error('Error marking chat notifications:', error);
     }
 };
-// export const markChatListRead = async (req, res) => {
-//     try {
-//         const { groupId, senderId } = req.body;
-//         const userId = req.user._id;
-
-//         const query = { recipientId: userId, isRead: false };
-//         if (groupId) query.groupId = groupId;
-//         if (senderId) query.senderId = senderId;
-
-//         const result = await Notification.updateMany(
-//             query,
-//             { $set: { isRead: true } }
-//         );
-
-//         res.json({
-//             success: true,
-//             modifiedCount: result.modifiedCount
-//         });
-//     } catch (error) {
-//         console.error('Error marking chat notifications:', error);
-//         console.log("fails to mark chat list as read ")
-//     }
-// };
 
 export const markAllRread = async (req, res) => {
     try {
