@@ -66,7 +66,7 @@ function ChatPage() {
         
         const chatListNotifications = unreadNotifications.filter((n) => {
             if (!item.members) {
-                return n.senderId === item._id;
+                return n.senderId?._id === item._id;
             } else {
                 return n.groupId === item._id;
             }
@@ -144,7 +144,7 @@ function ChatPage() {
                                     // for unread message notification is filtered as per each chat
                                     const chatListNotifications = unreadNotifications.filter((n) => {
                                         if (!chat.members) {
-                                            return n.senderId === chat._id;
+                                            return n.senderId?._id === chat._id;
                                         } else {
                                             return n.groupId === chat._id;
                                         }

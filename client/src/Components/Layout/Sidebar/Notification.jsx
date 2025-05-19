@@ -49,13 +49,13 @@ function Notification() {
                 <div style={{position:'absolute',top:'100%',right: -280,backgroundColor: 'white',border: '1px solid #ddd',borderRadius: '10px',padding: '10px',width: '350px',zIndex: 10}}>
                     <div style={{display:'flex', justifyContent: 'space-between', color:'black', fontFamily:'cursive'}}>
                         <div></div>
-                        <button onClick={handleMarkAllAsRead}disabled={unreadNotifications.length === 0}>
+                        <button onClick={handleMarkAllAsRead} disabled={unreadNotifications.length === 0}>
                             Mark all as read
                         </button>
                     </div>
                     <div style={{maxHeight: '400px', overflowY: 'auto'}}>
                         {notification.map((notif) => (
-                            <div key={notif._id} onClick={() => handleMarkAsRead(notif._id)}style={{padding: '8px',borderBottom: '1px solid #eee',backgroundColor: notif.isRead ? '#fff' : '#f5f5f5',cursor: 'pointer',color:'black',fontFamily:'sans-serif',fontSize:'0.8rem',margin:'5px'}}>
+                            <div key={notif._id} onClick={() => handleMarkAsRead(notif._id)} style={{padding: '8px',borderBottom: '1px solid #eee',backgroundColor: notif.isRead ? '#fff' : '#f5f5f5',cursor: 'pointer',color:'black',fontFamily:'sans-serif',fontSize:'0.8rem',margin:'5px'}}>
                                 <div>{notif.content}</div>
                                 <div style={{fontSize: '0.6rem', color: '#666', fontFamily:'cursive'}}>
                                     {new Date(notif.createdAt).toLocaleString()}
