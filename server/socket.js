@@ -195,7 +195,7 @@ export const setupSocket = (server) => {
                 { new: true, populate: "members admin" }
             );
 
-            const notificationData = Notification.create({
+            const notificationData = await Notification.create({
                 groupId: group._id,
                 isRead: false,
                 date: new Date(),
