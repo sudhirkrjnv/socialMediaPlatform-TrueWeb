@@ -87,6 +87,22 @@ const browserRouter = createBrowserRouter([
             dispatch(updateMessageStatus({ messageId, status }));
       });
 
+      socketio.on('notificationRead', ({ notificationId }) => {
+          dispatch(markNotificationAsRead([notificationId]));
+      });
+
+      socketio.on('chatNotificationsRead', ({ chatId }) => {
+          const isGroup = selectedChatData?.members;
+          dispatch(markChatListNotificationAsRead({
+              groupId: isGroup ? chatId : undefined,
+              senderId: !isGroup ? chatId : undefined
+          }));
+      });
+
+      socketio.on('allNotificationsRead', () => {
+          dispatch(markAllNotificationAsRead());
+      });
+
       socketio.on('onlineUsers', (onlineUsers) => {
         dispatch(setOnlineUsers(onlineUsers));
       });
@@ -119,18 +135,6 @@ const browserRouter = createBrowserRouter([
                 dispatch(setNotification(prev => [data, ...prev]));
             }
         }
-      });
-
-      socketio.on('notificationsRead', ({ notificationIds }) => {
-        dispatch(markNotificationAsRead({ notificationIds }));
-      });
-
-      socketio.on('chatListNotificationsRead', ({ groupId, senderId }) => {
-        dispatch(markChatListNotificationAsRead({ groupId, senderId }));
-      });
-
-      socketio.on('allNotificationsRead', () => {
-        dispatch(markAllNotificationAsRead());
       });
 
       return () => {

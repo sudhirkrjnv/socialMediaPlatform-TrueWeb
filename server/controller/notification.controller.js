@@ -32,8 +32,14 @@ export const markAsRead = async (req, res) => {
         const {notificationId} = req.params;
         const result = await Notification.findByIdAndUpdate(
             {_id: notificationId, recipientId: req.id},
-            {$set: {isRead: true}}
+            {$set: {isRead: true}},
+            {new: true}
         )
+        // Emit socket event
+        req.io.emit('notificationRead', {
+            notificationId,
+            recipientId: req.id
+        });
         res.status(200).json({
             success: true,
             message: 'Notification mark as read!',
@@ -52,7 +58,14 @@ export const markChatListRead = async (req, res) => {
                 recipientId:req.id,
                 $or: [{senderId: chatId}, {groupId: chatId}]
             }, 
-            {$set: {isRead:true}} )
+            {$set: {isRead:true}} 
+        )
+
+        // Emit socket event
+        req.io.emit('chatNotificationsRead', {
+            recipientId: req.id,
+            chatId
+        });
     
         res.status(result.modifiedCount ? 200 : 404).json({
             success: !!result.modifiedCount,
@@ -69,6 +82,11 @@ export const markAllRread = async (req, res) => {
             { recipientId: req.id, isRead: false },
             { $set: { isRead: true } }
         );
+        
+        // Emit socket event
+        req.io.emit('allNotificationsRead', {
+            recipientId: req.id
+        });
 
         res.json({
             success: true,
