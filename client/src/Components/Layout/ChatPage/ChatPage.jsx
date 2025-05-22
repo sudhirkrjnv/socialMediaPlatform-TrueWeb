@@ -66,9 +66,9 @@ function ChatPage() {
         
         const chatListNotifications = unreadNotifications.filter((n) => {
             if (!item.members) {
-                return n.senderId?._id === item._id;
+                return n.type === "message" && n.senderId?._id?.toString() === item._id?.toString();
             } else {
-                return n.groupId === item._id;
+                return n.type === "group" && n.groupId?.toString() === item._id?.toString();
             }
         });
     
@@ -139,14 +139,14 @@ function ChatPage() {
                             (searchQuery ? filteredUsers : recentList).length > 0 ? (
                                 (searchQuery ? filteredUsers : recentList).map((chat) => {
 
-                                    //console.log("chat", chat);
+                                    console.log("chat", chat);
 
                                     // for unread message notification is filtered as per each chat
                                     const chatListNotifications = unreadNotifications.filter((n) => {
                                         if (!chat.members) {
-                                            return n.senderId?._id === chat._id;
+                                            return n.type === "message" && n.senderId?._id?.toString() === chat._id?.toString();
                                         } else {
-                                            return n.groupId === chat._id;
+                                            return n.type === "group" &&  n.groupId?.toString() === chat._id?.toString();
                                         }
                                     });
                                     //console.log("chatListNotifications", chatListNotifications);
