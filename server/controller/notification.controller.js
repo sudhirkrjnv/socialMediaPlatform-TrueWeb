@@ -3,7 +3,10 @@ import { Notification } from "../models/notification.model.js"
 export const fetchNotification = async (req, res) => {
     try {
         const notifications = await Notification.find({
-            recipientId: req.id
+            $and: [
+                { recipientId: req.id },
+                { senderId: { $ne: req.id } }
+            ]
         })
         .sort({ createdAt: -1 })
         .limit(50)

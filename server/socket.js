@@ -142,6 +142,7 @@ export const setupSocket = (server) => {
                     const notificationData = await Notification.create({
                         groupId: group._id,
                         recipientId: member._id,
+                        senderId: message.sender,
                         isRead: false,
                         date: new Date(),
                         content: message.content || "New group message",
