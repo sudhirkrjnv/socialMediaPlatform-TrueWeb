@@ -1,4 +1,5 @@
 import { Notification } from "../models/notification.model.js"
+import { io, userSocketsMap } from '../socket.js';
 
 export const fetchNotification = async (req, res) => {
     try {
@@ -38,10 +39,16 @@ export const markAsRead = async (req, res) => {
             {new: true}
         )
         // Emit socket event
-        req.io.emit('notificationRead', {
-            notificationId,
-            recipientId: req.id
-        });
+        const recipientSockets = userSocketsMap?.get(req.id.toString());
+        if (recipientSockets) {
+            recipientSockets.forEach(socketId => {
+                io?.to(socketId).emit('notificationRead', {
+                    notificationId,
+                    recipientId: req.id
+                });
+            });
+        }
+       
         res.status(200).json({
             success: true,
             message: 'Notification mark as read!',
@@ -64,10 +71,15 @@ export const markChatListRead = async (req, res) => {
         )
 
         // Emit socket event
-        req.io.emit('chatNotificationsRead', {
-            recipientId: req.id,
-            chatId
-        });
+        const recipientSocketIds = userSocketsMap?.get(req.id.toString());
+        if (recipientSocketIds) {
+            recipientSocketIds.forEach(socketId => {
+                io?.to(socketId).emit('chatNotificationsRead', {
+                    recipientId: req.id,
+                    chatId
+                });
+            });
+        }
     
         res.status(result.modifiedCount ? 200 : 404).json({
             success: !!result.modifiedCount,
@@ -86,9 +98,14 @@ export const markAllRread = async (req, res) => {
         );
         
         // Emit socket event
-        req.io.emit('allNotificationsRead', {
-            recipientId: req.id
-        });
+        const recipientSocketIds = userSocketsMap?.get(req.id.toString());
+        if (recipientSocketIds) {
+            recipientSocketIds.forEach(socketId => {
+                io?.to(socketId).emit('allNotificationsRead', {
+                    recipientId: req.id
+                });
+            });
+        }
 
         res.json({
             success: true,
