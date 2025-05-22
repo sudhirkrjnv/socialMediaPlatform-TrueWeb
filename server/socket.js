@@ -56,6 +56,7 @@ export const setupSocket = (server) => {
                 date: new Date(),
                 content: message.content || "New message"
             })
+            const populatedNotification = await notificationData.populate("senderId", "name username profilePicture");
             
             //console.log("Message Data:", messageData);
 
@@ -77,7 +78,7 @@ export const setupSocket = (server) => {
                         ...messageData._doc,
                         status: 'delivered'
                     })
-                    io.to(sid).emit("getNotification", notificationData);
+                    io.to(sid).emit("getNotification", populatedNotification);
                 });
                 if(senderSocketIds){
                     senderSocketIds.forEach(sid=>io.to(sid).emit("messageStatusUpdate", {
@@ -148,10 +149,11 @@ export const setupSocket = (server) => {
                         content: message.content || "New group message",
                         type: "group"
                     })
+                    const populatedNotification = await notificationData.populate("senderId", "name username profilePicture");
                     socketIds.forEach(sid =>{
                         io.to(sid).emit("receive_Group_Message", { ...messageData._doc, groupId: group._id, timestamp: messageData.timestamp });
                         if (member._id.toString() !== message.sender.toString()) {
-                            io.to(sid).emit("getNotification", notificationData);
+                            io.to(sid).emit("getNotification", populatedNotification);
                         }
                     }) 
                 }

@@ -10,7 +10,6 @@ export const fetchNotification = async (req, res) => {
         })
         .sort({ createdAt: -1 })
         .limit(50)
-        .populate('senderId', 'name username profilePicture');
 
         if (!notifications || notifications.length === 0) {
             return res.status(200).json({

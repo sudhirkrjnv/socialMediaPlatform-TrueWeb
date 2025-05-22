@@ -139,7 +139,7 @@ function ChatPage() {
                             (searchQuery ? filteredUsers : recentList).length > 0 ? (
                                 (searchQuery ? filteredUsers : recentList).map((chat) => {
 
-                                    console.log("chat", chat);
+                                    //console.log("chat", chat);
 
                                     // for unread message notification is filtered as per each chat
                                     const chatListNotifications = unreadNotifications.filter((n) => {

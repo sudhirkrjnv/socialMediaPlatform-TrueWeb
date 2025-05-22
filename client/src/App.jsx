@@ -113,28 +113,29 @@ const browserRouter = createBrowserRouter([
       });
 
       socketio.on('getNotification', (data) => {
-        if (data.recipientId) {
-          const isCorrectIndividualChatOpen = 
-              selectedChatData?._id === data.senderId && 
-              !selectedChatData?.members;
+        dispatch(setNotification(prev => [data, ...prev]));
+        // if (data.recipientId) {
+        //   const isCorrectIndividualChatOpen = 
+        //       selectedChatData?._id === data.senderId && 
+        //       !selectedChatData?.members;
           
-          if (isCorrectIndividualChatOpen) {
-              dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
-          } else {
-              dispatch(setNotification(prev => [data, ...prev]));
-          }
-        }
-        else if (data.groupId) {
-            const isCorrectGroupChatOpen = 
-                selectedChatData?._id === data.groupId && 
-                selectedChatData?.members;
+        //   if (isCorrectIndividualChatOpen) {
+        //       dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
+        //   } else {
+        //       dispatch(setNotification(prev => [data, ...prev]));
+        //   }
+        // }
+        // else if (data.groupId) {
+        //     const isCorrectGroupChatOpen = 
+        //         selectedChatData?._id === data.groupId && 
+        //         selectedChatData?.members;
             
-            if (isCorrectGroupChatOpen) {
-                dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
-            } else {
-                dispatch(setNotification(prev => [data, ...prev]));
-            }
-        }
+        //     if (isCorrectGroupChatOpen) {
+        //         dispatch(setNotification(prev => [{ ...data, isRead: true }, ...prev]));
+        //     } else {
+        //         dispatch(setNotification(prev => [data, ...prev]));
+        //     }
+        // }
       });
 
       return () => {
