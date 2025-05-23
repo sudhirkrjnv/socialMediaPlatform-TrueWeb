@@ -1,5 +1,5 @@
 import { Notification } from "../models/notification.model.js"
-import { io, userSocketsMap } from '../socket.js';
+import { io, userSocketsMap } from "../socket.js"
 
 export const fetchNotification = async (req, res) => {
     try {
@@ -9,6 +9,7 @@ export const fetchNotification = async (req, res) => {
                 { senderId: { $ne: req.id } }
             ]
         })
+        .populate('senderId', 'name username profilePicture')
         .sort({ createdAt: -1 })
         .limit(50)
 
@@ -38,15 +39,17 @@ export const markAsRead = async (req, res) => {
             {$set: {isRead: true}},
             {new: true}
         )
-        // Emit socket event
-        const recipientSockets = userSocketsMap?.get(req.id.toString());
-        if (recipientSockets) {
-            recipientSockets.forEach(socketId => {
-                io?.to(socketId).emit('notificationRead', {
-                    notificationId,
-                    recipientId: req.id
+        
+        if (io && userSocketsMap) {
+            const recipientSocketIds = userSocketsMap.get(req.id.toString());
+            if (recipientSocketIds) {
+                recipientSocketIds.forEach(socketId => {
+                    io.to(socketId).emit('notificationRead', {
+                        notificationId,
+                        recipientId: req.id
+                    });
                 });
-            });
+            }
         }
        
         res.status(200).json({
@@ -58,27 +61,29 @@ export const markAsRead = async (req, res) => {
         console.error("Error marking notification as read", error)
     }
 };
+
 export const markChatListRead = async (req, res) => {
     try {
         const {chatId} = req.params;
 
         const result = await Notification.updateMany( 
             {
-                recipientId:req.id,
+                recipientId: req.id,
                 $or: [{senderId: chatId}, {groupId: chatId}]
             }, 
             {$set: {isRead:true}} 
         )
-
-        // Emit socket event
-        const recipientSocketIds = userSocketsMap?.get(req.id.toString());
-        if (recipientSocketIds) {
-            recipientSocketIds.forEach(socketId => {
-                io?.to(socketId).emit('chatNotificationsRead', {
-                    recipientId: req.id,
-                    chatId
+        
+        if (io && userSocketsMap) {
+            const recipientSocketIds = userSocketsMap.get(req.id.toString());
+            if (recipientSocketIds) {
+                recipientSocketIds.forEach(socketId => {
+                    io.to(socketId).emit('chatNotificationsRead', {
+                        recipientId: req.id,
+                        chatId
+                    });
                 });
-            });
+            }
         }
     
         res.status(result.modifiedCount ? 200 : 404).json({
@@ -90,21 +95,22 @@ export const markChatListRead = async (req, res) => {
     }
 };
 
-export const markAllRread = async (req, res) => {
+export const markAllRead = async (req, res) => {
     try {
         const result = await Notification.updateMany(
             { recipientId: req.id, isRead: false },
             { $set: { isRead: true } }
         );
         
-        // Emit socket event
-        const recipientSocketIds = userSocketsMap?.get(req.id.toString());
-        if (recipientSocketIds) {
-            recipientSocketIds.forEach(socketId => {
-                io?.to(socketId).emit('allNotificationsRead', {
-                    recipientId: req.id
+        if (io && userSocketsMap) {
+            const recipientSocketIds = userSocketsMap.get(req.id.toString());
+            if (recipientSocketIds) {
+                recipientSocketIds.forEach(socketId => {
+                    io.to(socketId).emit('allNotificationsRead', {
+                        recipientId: req.id
+                    });
                 });
-            });
+            }
         }
 
         res.json({
@@ -113,6 +119,5 @@ export const markAllRread = async (req, res) => {
         });
     } catch (error) {
         console.error('Error marking all notifications:', error);
-        console.log("fails to mark all read ")
     }
 };

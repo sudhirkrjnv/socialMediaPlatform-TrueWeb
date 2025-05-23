@@ -8,6 +8,7 @@ import messageRoute from "./routes/message.routes.js";
 import notificationRoute from "./routes/notification.routes.js"
 import cookieParser from "cookie-parser";
 import { setupSocket } from "./socket.js";
+
 dotenv.config({});
 
 const app = express();

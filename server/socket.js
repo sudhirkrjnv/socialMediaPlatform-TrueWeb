@@ -9,7 +9,7 @@ export const userSocketsMap = new Map();
 
 export const setupSocket = (server) => {
     
-    const io = new Server(server, {
+    io = new Server(server, {
         cors: {
             origin: 'http://localhost:3000',
             methods: ['GET', 'POST'],
@@ -23,6 +23,7 @@ export const setupSocket = (server) => {
         }
         userSocketsMap.get(userId).add(socketId);
     };
+    
     const removeUserSocket = (userId, socketId) => {
         if (!userSocketsMap.has(userId)) return;
         const sockets = userSocketsMap.get(userId);
@@ -50,6 +51,7 @@ export const setupSocket = (server) => {
         socket.on("sendMessage", async (message) => {   
             const messageData = await Message.create(message)
             .then(m => m.populate("sender recipient", "username name profilePicture"));
+            
             const notificationData = await Notification.create({
                 senderId: message.sender,
                 recipientId: message.recipient,
@@ -71,7 +73,6 @@ export const setupSocket = (server) => {
 
             const recipientSocketIds = userSocketsMap.get(message.recipient?.toString());
             if (recipientSocketIds) {
-
                 await Message.findByIdAndUpdate(messageData._id, { status: 'delivered' });
 
                 recipientSocketIds.forEach(sid => {
@@ -88,7 +89,6 @@ export const setupSocket = (server) => {
                     }))
                 }
             }
-            
         });
 
         socket.on("messageRead", async ({ messageId, readerId }) => {
@@ -105,7 +105,6 @@ export const setupSocket = (server) => {
                 }));
             }
         });
-
 
         socket.on("newGroupCreated", ({ group, memberIds }) => {
             memberIds.forEach(userId => {
@@ -151,6 +150,7 @@ export const setupSocket = (server) => {
                         type: "group"
                     })
                     const populatedNotification = await notificationData.populate("senderId", "name username profilePicture");
+                    
                     socketIds.forEach(sid =>{
                         io.to(sid).emit("receive_Group_Message", { ...messageData._doc, groupId: group._id, timestamp: messageData.timestamp });
                         if (member._id.toString() !== message.sender.toString()) {
