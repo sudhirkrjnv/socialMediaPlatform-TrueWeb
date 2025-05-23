@@ -5,6 +5,7 @@ import authSlice from "./authSlice.js"
 import postSlice from "./postSlice.js";
 import chatSlice from "./chatSlice.js";
 import socketSlice from "./socketSlice.js"
+import notificationSlice from "./notificationSlice.js"
 import { thunk } from "redux-thunk";
 
 const persistConfig = {
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
     post:postSlice,
     chat: chatSlice,
     socket: socketSlice,
+    notification: notificationSlice,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

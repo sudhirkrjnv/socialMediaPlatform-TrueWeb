@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import {NotificationAddRounded} from '@mui/icons-material';
 import {useSelector, useDispatch} from 'react-redux';
-import { loadNotifications, markNotificationAsRead, markAllNotificationAsRead } from '../../../redux/chatSlice.js';
+import { loadNotifications, markNotificationAsRead, markAllNotificationAsRead } from '../../../redux/notificationSlice.js';
 
 function Notification() {
     const [open, setOpen] = useState(false);
-    const {notification} = useSelector(store => store.chat);
+    const {notification} = useSelector(store => store.notification);
 
     const dispatch = useDispatch();
 

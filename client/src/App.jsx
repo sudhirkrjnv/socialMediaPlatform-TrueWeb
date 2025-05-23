@@ -10,7 +10,8 @@ import { useEffect} from 'react';
 import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
 import { setSocket, setTypingData, setOnlineUsers} from './redux/socketSlice';
-import { addMessage, updateMessageStatus, addGroupList, updateRecentIndividualChatList, updateRecentGroupChatList, loadNotifications, setNotification, _markAllNotificationsAsRead, _markNotificationAsRead, _markChatListNotificationsAsRead } from './redux/chatSlice';
+import { addMessage, updateMessageStatus, addGroupList, updateRecentIndividualChatList, updateRecentGroupChatList } from './redux/chatSlice';
+import { loadNotifications, setNotification, _markAllNotificationsAsRead, _markNotificationAsRead, _markChatListNotificationsAsRead } from './redux/notificationSlice.js';
 
 const browserRouter = createBrowserRouter([
   {
@@ -45,9 +46,10 @@ const browserRouter = createBrowserRouter([
     
     const { user } = useSelector((store) => store.auth);
     const { socket } = useSelector((store) => store.socket);
+    const {notification} = useSelector(store => store.notification);
+    
     const dispatch = useDispatch();
 
-    const {notification} = useSelector(store => store.chat);
     console.log("Notification", notification);
   
   useEffect(() => {

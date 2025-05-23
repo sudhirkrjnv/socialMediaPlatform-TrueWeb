@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedChatType, setSelectedChatData, setIndividualList, setSelectedChatMessages, setGroupList, markChatListNotificationAsRead} from '../../../redux/chatSlice.js';
+import { setSelectedChatType, setSelectedChatData, setIndividualList, setSelectedChatMessages, setGroupList } from '../../../redux/chatSlice.js';
+import { markChatListNotificationAsRead} from '../../../redux/notificationSlice.js';
 import './ChatPage.css';
 import { Avatar } from '@mui/material';
 import {AddCommentOutlined, MoreVertOutlined, Group} from '@mui/icons-material';
@@ -20,7 +21,7 @@ function ChatPage() {
     const { socket, onlineUsers } = useSelector(store => store.socket);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const {notification} = useSelector(store => store.chat);
+    const {notification} = useSelector(store => store.notification);
 
     const getUnreadNotification = (notification)=>{
         return notification.filter((n)=>n.isRead === false)
