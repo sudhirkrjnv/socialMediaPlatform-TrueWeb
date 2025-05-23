@@ -64,6 +64,19 @@ function MessagesContainer() {
         setMessage("");
     }
     
+    useEffect(() => {
+        if (socket && selectedChatData?._id) {
+            const chatId = selectedChatType === 'Group' 
+                ? selectedChatData._id 
+                : selectedChatData._id;
+            socket.emit('activateChat', { chatId });
+
+            return () => {
+                socket.emit('deactivateChat', { chatId });
+            };
+        }
+    }, [socket, selectedChatData, selectedChatType]);
+    
     const handleTyping = ()=>{
         if (selectedChatType === "Individual") {
             socket.emit("typing", {
@@ -77,6 +90,8 @@ function MessagesContainer() {
             });
         }
     }
+
+
     
   return (
     <div>

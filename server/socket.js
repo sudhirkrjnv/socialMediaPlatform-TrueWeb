@@ -6,6 +6,7 @@ import { Notification } from './models/notification.model.js'
 
 export let io;
 export const userSocketsMap = new Map();
+const activeUserChats = new Map();
 
 export const setupSocket = (server) => {
     
@@ -47,21 +48,25 @@ export const setupSocket = (server) => {
 
             io.emit('onlineUsers', getOnlineUsers());
         }
+
+        socket.on('activateChat', ({ chatId }) => {
+            if (!activeUserChats.has(userId)) {
+                activeUserChats.set(userId, new Set());
+            }
+            activeUserChats.get(userId).add(chatId);
+            console.log(`User ${userId} activated chat ${chatId}`);
+        });
+
+        socket.on('deactivateChat', ({ chatId }) => {
+            if (activeUserChats.has(userId)) {
+                activeUserChats.get(userId).delete(chatId);
+                console.log(`User ${userId} deactivated chat ${chatId}`);
+            }
+        });
         
         socket.on("sendMessage", async (message) => {   
             const messageData = await Message.create(message)
             .then(m => m.populate("sender recipient", "username name profilePicture"));
-            
-            const notificationData = await Notification.create({
-                senderId: message.sender,
-                recipientId: message.recipient,
-                isRead: false,
-                date: new Date(),
-                content: message.content || "New message"
-            })
-            const populatedNotification = await notificationData.populate("senderId", "name username profilePicture");
-            
-            //console.log("Message Data:", messageData);
 
             const senderSocketIds = userSocketsMap.get(message.sender?.toString());
             if (senderSocketIds) {
@@ -71,22 +76,46 @@ export const setupSocket = (server) => {
                 }));
             }
 
+            
             const recipientSocketIds = userSocketsMap.get(message.recipient?.toString());
             if (recipientSocketIds) {
                 await Message.findByIdAndUpdate(messageData._id, { status: 'delivered' });
-
+                
                 recipientSocketIds.forEach(sid => {
                     io.to(sid).emit("receiveMessage", {
                         ...messageData._doc,
                         status: 'delivered'
                     })
-                    io.to(sid).emit("getNotification", populatedNotification);
+                    //io.to(sid).emit("getNotification", populatedNotification);
                 });
                 if(senderSocketIds){
                     senderSocketIds.forEach(sid=>io.to(sid).emit("messageStatusUpdate", {
                         messageId: messageData._id,
                         status: 'delivered'
                     }))
+                }
+            }
+
+
+            const recipientId = message.recipient?.toString();
+            const senderId = message.sender?.toString();
+            const isChatActive = activeUserChats.get(recipientId)?.has(senderId);
+
+            if (!isChatActive) {
+                const notificationData = await Notification.create({
+                    senderId: message.sender,
+                    recipientId: message.recipient,
+                    isRead: false,
+                    date: new Date(),
+                    content: message.content || "New message"
+                });
+                const populatedNotification = await notificationData.populate("senderId", "name username profilePicture");
+
+                const recipientSocketIds = userSocketsMap.get(recipientId);
+                if (recipientSocketIds) {
+                    recipientSocketIds.forEach(sid => {
+                        io.to(sid).emit("getNotification", populatedNotification);
+                    });
                 }
             }
         });
@@ -140,23 +169,34 @@ export const setupSocket = (server) => {
             [...group.members, group.admin].forEach(async(member) => {
                 const socketIds = userSocketsMap.get(member._id.toString());
                 if (socketIds) {
-                    const notificationData = await Notification.create({
-                        groupId: group._id,
-                        recipientId: member._id,
-                        senderId: message.sender,
-                        isRead: false,
-                        date: new Date(),
-                        content: message.content || "New group message",
-                        type: "group"
-                    })
-                    const populatedNotification = await notificationData.populate("senderId", "name username profilePicture");
-                    
                     socketIds.forEach(sid =>{
                         io.to(sid).emit("receive_Group_Message", { ...messageData._doc, groupId: group._id, timestamp: messageData.timestamp });
-                        if (member._id.toString() !== message.sender.toString()) {
-                            io.to(sid).emit("getNotification", populatedNotification);
-                        }
+                        // if (member._id.toString() !== message.sender.toString()) {
+                        //      io.to(sid).emit("getNotification", populatedNotification);
+                        // }
                     }) 
+
+                    const memberId = member._id.toString();
+                    const isChatActive = activeUserChats.get(memberId)?.has(group._id.toString());
+
+                    if(!isChatActive){
+                        const notificationData = await Notification.create({
+                            groupId: group._id,
+                            recipientId: member._id,
+                            senderId: message.sender,
+                            isRead: false,
+                            date: new Date(),
+                            content: message.content || "New group message",
+                            type: "group"
+                        })
+                        const populatedNotification = await notificationData.populate("senderId", "name username profilePicture");
+                        
+                        socketIds.forEach(sid =>{
+                            if (member._id.toString() !== message.sender.toString()) {
+                                io.to(sid).emit("getNotification", populatedNotification);
+                            }
+                        })
+                    }
                 }
             });
         });

@@ -17,7 +17,7 @@ function ChatPage() {
     const [privateChatOpen, setPrivateChatOpen] = useState(false);
     const [groupChatOpen, setGroupChatOpen] = useState(false);
     const {individualList, selectedChatData, groupList} = useSelector(store => store.chat);
-    const { onlineUsers } = useSelector(store => store.socket);
+    const { socket, onlineUsers } = useSelector(store => store.socket);
     const [searchQuery, setSearchQuery] = useState("");
 
     const {notification} = useSelector(store => store.chat);
@@ -64,6 +64,15 @@ function ChatPage() {
             dispatch(setSelectedChatMessages([]));
         }
         
+        if (socket) {
+            const chatId = isGroupChat ? item._id : item._id;
+            socket.emit('activateChat', { chatId });
+            
+            if (selectedChatData?._id) {
+                socket.emit('deactivateChat', { chatId: selectedChatData._id });
+            }
+        }
+
         const chatListNotifications = unreadNotifications.filter((n) => {
             if (!item.members) {
                 return n.type === "message" && n.senderId?._id?.toString() === item._id?.toString();
