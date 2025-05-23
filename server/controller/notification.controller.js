@@ -1,4 +1,5 @@
 import { Notification } from "../models/notification.model.js"
+import { Group } from "../models/group.model.js";
 import { io, userSocketsMap } from "../socket.js"
 
 export const fetchNotification = async (req, res) => {
@@ -66,6 +67,8 @@ export const markChatListRead = async (req, res) => {
     try {
         const {chatId} = req.params;
 
+        const isGroup = await Group.exists({ _id: chatId });
+        
         const result = await Notification.updateMany( 
             {
                 recipientId: req.id,
@@ -80,7 +83,8 @@ export const markChatListRead = async (req, res) => {
                 recipientSocketIds.forEach(socketId => {
                     io.to(socketId).emit('chatNotificationsRead', {
                         recipientId: req.id,
-                        chatId
+                        chatId,
+                        isGroup
                     });
                 });
             }
@@ -94,6 +98,62 @@ export const markChatListRead = async (req, res) => {
         console.error('Error marking chat notifications:', error);
     }
 };
+
+// export const markChatListRead = async (req, res) => {
+//     try {
+//         const {chatId} = req.params;
+//         const group = await Group.findById(chatId);
+//         const isGroup = !!group;
+
+//         let result;
+//         if (isGroup) {
+//             result = await Notification.updateMany( 
+//                 {
+//                     recipientId: req.id,
+//                     groupId: chatId,
+//                     type: "group" // Only group notifications
+//                 }, 
+//                 {$set: {isRead: true}} 
+//             );
+//         } else {
+//             result = await Notification.updateMany( 
+//                 {
+//                     recipientId: req.id,
+//                     senderId: chatId,
+//                     type: "message" // Only individual message notifications
+//                 }, 
+//                 {$set: {isRead: true}} 
+//             );
+//         }
+        
+//         if (io && userSocketsMap) {
+//             const recipientSocketIds = userSocketsMap.get(req.id.toString());
+//             if (recipientSocketIds) {
+//                 recipientSocketIds.forEach(socketId => {
+//                     io.to(socketId).emit('chatNotificationsRead', {
+//                         recipientId: req.id,
+//                         chatId,
+//                         isGroup // Send the type information
+//                     });
+//                 });
+//             }
+//         }
+    
+//         res.status(result.modifiedCount ? 200 : 404).json({
+//             success: !!result.modifiedCount,
+//             message: result.modifiedCount 
+//                 ? 'ChatList notifications marked as read!' 
+//                 : 'No matching notification found!',
+//             isGroup
+//         });
+//     } catch (error) {
+//         console.error('Error marking chat notifications:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: 'Internal server error'
+//         });
+//     }
+// };
 
 export const markAllRead = async (req, res) => {
     try {

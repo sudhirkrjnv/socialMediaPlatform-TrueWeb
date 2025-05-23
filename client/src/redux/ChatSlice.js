@@ -158,8 +158,8 @@ export const markNotificationAsRead = (notificationIds) => async (dispatch) => {
 
 export const markChatListNotificationAsRead = ({ groupId, senderId }) => async (dispatch, getState) => {
   try {
-        const chatId = getState().chat.selectedChatType === 'Group' ? groupId : senderId;
         dispatch(chatSlice.actions._markChatListNotificationsAsRead({ groupId, senderId }));
+        const chatId = getState().chat.selectedChatType === 'Group' ? groupId : senderId;
         const response = await axios.post(`http://localhost:8000/api/v1/notifications/mark-chat-list-read/${chatId}`, {},{ withCredentials: true });
         return response.data;
     } catch (error) {
@@ -195,7 +195,7 @@ export const {
     updateRecentGroupChatList,
     setNotification,
     _markNotificationAsRead,
-    _markChatListNotificationAsRead,
+    _markChatListNotificationsAsRead,
     _markAllNotificationsAsRead,
     closeChat,
 } = chatSlice.actions;

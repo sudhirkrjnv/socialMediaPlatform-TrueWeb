@@ -10,7 +10,7 @@ import { useEffect} from 'react';
 import { io } from 'socket.io-client';
 import {useSelector, useDispatch} from 'react-redux';
 import { setSocket, setTypingData, setOnlineUsers} from './redux/socketSlice';
-import { addMessage, updateMessageStatus, addGroupList, updateRecentIndividualChatList, updateRecentGroupChatList, loadNotifications, setNotification, markNotificationAsRead, markChatListNotificationAsRead, markAllNotificationAsRead } from './redux/chatSlice';
+import { addMessage, updateMessageStatus, addGroupList, updateRecentIndividualChatList, updateRecentGroupChatList, loadNotifications, setNotification, _markAllNotificationsAsRead, _markNotificationAsRead, _markChatListNotificationsAsRead } from './redux/chatSlice';
 
 const browserRouter = createBrowserRouter([
   {
@@ -49,7 +49,6 @@ const browserRouter = createBrowserRouter([
 
     const {notification} = useSelector(store => store.chat);
     console.log("Notification", notification);
-    const { selectedChatData} = useSelector(store => store.chat);
   
   useEffect(() => {
     if (user) {
@@ -87,20 +86,19 @@ const browserRouter = createBrowserRouter([
             dispatch(updateMessageStatus({ messageId, status }));
       });
 
-      socketio.on('notificationRead', ({ notificationId }) => {
-          dispatch(markNotificationAsRead([notificationId]));
+      socketio.on('notificationRead', ({ notificationId, recipientId }) => {
+          dispatch(_markNotificationAsRead({notificationIds: notificationId}));
       });
 
-      socketio.on('chatNotificationsRead', ({ chatId }) => {
-          const isGroup = selectedChatData?.members;
-          dispatch(markChatListNotificationAsRead({
-              groupId: isGroup ? chatId : undefined,
-              senderId: !isGroup ? chatId : undefined
+      socketio.on('chatNotificationsRead', ({ recipientId, chatId, isGroup }) => {
+          dispatch(_markChatListNotificationsAsRead({ 
+            groupId: isGroup ? chatId : undefined, 
+            senderId: !isGroup ? chatId : undefined
           }));
       });
 
       socketio.on('allNotificationsRead', () => {
-          dispatch(markAllNotificationAsRead());
+          dispatch(_markAllNotificationsAsRead());
       });
 
       socketio.on('onlineUsers', (onlineUsers) => {
