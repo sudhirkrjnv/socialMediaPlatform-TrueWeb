@@ -23,10 +23,7 @@ function ChatPage() {
 
     const {notification} = useSelector(store => store.notification);
 
-    const getUnreadNotification = (notification)=>{
-        return notification.filter((n)=>n.isRead === false)
-    }
-    const unreadNotifications = getUnreadNotification(notification);
+    const unreadNotifications = notification.filter( n => n.isRead === false);
     //console.log(unreadNotifications);
 
     useEffect(() => {

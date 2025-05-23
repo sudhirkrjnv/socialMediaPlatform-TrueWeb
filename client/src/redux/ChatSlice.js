@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
 
 const chatSlice = createSlice({
     name: 'chat',
@@ -9,7 +8,6 @@ const chatSlice = createSlice({
         selectedChatMessages: [],
         individualList: [],
         groupList: [],
-        notification: [],
     },
     reducers: {
         setSelectedChatType: (state, action) => {
@@ -26,36 +24,6 @@ const chatSlice = createSlice({
         },
         setGroupList: (state, action) => {
             state.groupList = action.payload;
-        },
-        setNotification: (state, action) => {
-            state.notification = typeof action.payload === 'function' 
-                ? action.payload(state.notification || [])
-                : action.payload;
-        },
-        _markChatListNotificationsAsRead: (state, action) => {
-            const { groupId, senderId } = action.payload;
-
-            state.notification = state.notification.map(n => {
-                if ((groupId && n.groupId === groupId) || (senderId && n.senderId?._id === senderId)) {
-                    return { ...n, isRead: true };
-                }
-                return n;
-            });
-        },
-        _markNotificationAsRead: (state, action) => {
-            const { notificationIds } = action.payload;
-
-            state.notification = state.notification.map(n => 
-                notificationIds.includes(n._id)
-                    ? { ...n, isRead: true }
-                    : n
-            );
-        },
-        _markAllNotificationsAsRead: (state) => {
-            state.notification = state.notification.map(n => ({
-                ...n,
-                isRead: true,
-            }));
         },
         addGroupList: (state, action) => {
             const groupExists = state.groupList.some(g => g._id === action.payload._id);
@@ -136,52 +104,6 @@ const chatSlice = createSlice({
     },
 });
 
-export const loadNotifications = () => async (dispatch) => {
-    try {
-        const response = await axios.get('http://localhost:8000/api/v1/notifications', { withCredentials: true });
-        dispatch(chatSlice.actions.setNotification(response.data.notifications));
-    } catch (error) {
-        console.error("Error loading notifications:", error.response?.data?.message || error.message);
-    }
-};
-
-export const markNotificationAsRead = (notificationIds) => async (dispatch) => {
-  try {
-        dispatch(chatSlice.actions._markNotificationAsRead({ notificationIds }));
-        const response = await axios.patch(`http://localhost:8000/api/v1/notifications/mark-as-read/${notificationIds}`, {}, { withCredentials: true });
-        return response.data;
-    } catch (error) {
-        console.error("Error marking notifications as read:", error);
-        return { success: false };
-    }
-};
-
-export const markChatListNotificationAsRead = ({ groupId, senderId }) => async (dispatch, getState) => {
-  try {
-        dispatch(chatSlice.actions._markChatListNotificationsAsRead({ groupId, senderId }));
-        const chatId = getState().chat.selectedChatType === 'Group' ? groupId : senderId;
-        const response = await axios.post(`http://localhost:8000/api/v1/notifications/mark-chat-list-read/${chatId}`, {},{ withCredentials: true });
-        return response.data;
-    } catch (error) {
-        console.error("Error marking chat list notifications:", error);
-        return { success: false };
-    }
-};
-
-export const markAllNotificationAsRead = () => async (dispatch) => {
-    try {
-        dispatch(chatSlice.actions._markAllNotificationsAsRead());
-        const response = await axios.get('http://localhost:8000/api/v1/notifications/mark-all-read', { withCredentials: true });
-        if (response.data.success) {
-            console.log("All notifications marked as read!");
-        } else {
-            console.error("Failed to mark all notifications as read.");
-        }
-    } catch (error) {
-        console.error("Error in markAllNotificationsAsRead!", error);
-    }
-};
-
 export const { 
     setSelectedChatType,
     setSelectedChatData, 
@@ -193,10 +115,6 @@ export const {
     addGroupList, 
     updateRecentIndividualChatList,
     updateRecentGroupChatList,
-    setNotification,
-    _markNotificationAsRead,
-    _markChatListNotificationsAsRead,
-    _markAllNotificationsAsRead,
     closeChat,
 } = chatSlice.actions;
 
