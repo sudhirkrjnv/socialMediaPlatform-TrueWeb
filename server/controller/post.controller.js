@@ -3,6 +3,8 @@ import {Post} from '../models/post.models.js'
 import {User} from '../models/user.model.js'
 import sharp from 'sharp'
 import { Comment } from '../models/comment.model.js'
+import { Notification } from '../models/notification.model.js'
+import { io, userSocketsMap } from "../socket.js"
 
 export const addPost = async(req, res)=>{
     try {
@@ -80,6 +82,26 @@ export const likePost = async(req, res)=>{
         await post.updateOne({$addToSet:{likes:likeKrneWalaUserKiId}});
         await post.save();
 
+        if (post.author.toString() !== likeKrneWalaUserKiId.toString()) {
+            const notification = await Notification.create({
+                recipientId: post.author,
+                senderId: likeKrneWalaUserKiId,
+                postId: postKiId,
+                content: "liked your post",
+                type: "like"
+            });
+
+            const populatedNotification = await notification.populate("senderId", "name username profilePicture");
+
+            const recipientSocketIds = userSocketsMap.get(post.author.toString());
+            if (recipientSocketIds) {
+                recipientSocketIds.forEach(sid => {
+                    io.to(sid).emit("getNotification", populatedNotification);
+                });
+            }
+        }
+
+        
         return res.status(200).json({
             message:"Post Liked !",
             success:true
@@ -104,6 +126,23 @@ export const dislikePost = async(req, res)=>{
         }
         await post.updateOne({$pull:{likes:dislikeKrneWalaUserKiId}});
         await post.save();
+        console.log(post);
+
+        if (post.author.toString() !== dislikeKrneWalaUserKiId.toString()) {
+            await Notification.deleteOne({
+                recipientId: post.author._id,
+                senderId: dislikeKrneWalaUserKiId,
+                postId: postKiId,
+                type: "like"
+            });
+
+            const recipientSocketIds = userSocketsMap.get(post.author.toString());
+            if (recipientSocketIds) {
+                recipientSocketIds.forEach(sid => {
+                    io.to(sid).emit("refreshNotification");
+                });
+            }
+        }
         
         return res.status(200).json({
             message:"Post Disliked !",
@@ -139,8 +178,26 @@ export const addComment = async(req, res)=>{
 
         post.comments.push(comment._id);
 
-
         await post.save();
+
+        if (post.author.toString() !== commentKrneWalaUserKiId.toString()) {
+            const notification = await Notification.create({
+                recipientId: post.author._id,
+                senderId: commentKrneWalaUserKiId,
+                postId: postKiId,
+                content: "commented on your post",
+                type: "comment"
+            });
+
+            const populatedNotification = await notification.populate("senderId", "name username profilePicture");
+
+            const recipientSocketIds = userSocketsMap.get(post.author.toString());
+            if (recipientSocketIds) {
+                recipientSocketIds.forEach(sid => {
+                    io.to(sid).emit("getNotification", populatedNotification);
+                });
+            }
+        }
 
         return res.status(200).json({
             message:"Comment Added",

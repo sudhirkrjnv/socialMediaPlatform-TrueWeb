@@ -116,6 +116,10 @@ const browserRouter = createBrowserRouter([
         dispatch(setNotification(prev => [data, ...prev]));
       });
 
+      socketio.on('refreshNotification', (data) => {
+        dispatch(loadNotifications());
+      });
+
       return () => {
           socketio.disconnect();
           dispatch(setSocket(null));

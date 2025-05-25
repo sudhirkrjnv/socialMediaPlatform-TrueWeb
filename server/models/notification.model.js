@@ -6,9 +6,11 @@ const notificationSchema = new mongoose.Schema(
         senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group' },
         messageId: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },
+        postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
+        commentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment' },
         content: { type: String, required: true },
         isRead: { type: Boolean, default: false },
-        type: { type: String, enum: ['message', 'group', 'system'], default: 'message' }
+        type: { type: String, enum: ['message', 'group', 'system', 'like', 'comment'], default: 'message' }
     },
     { timestamps: true }
 );
