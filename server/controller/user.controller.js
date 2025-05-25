@@ -179,6 +179,56 @@ export const editProfile = async(req, res)=>{
     }
 }
 
+
+export const followUnfollow = async (req, res) =>{
+    try {
+        const followKrneWalaKiId = req.id;
+        const jiskoFollowKarungaUskaId = req.params.id;
+
+        if(followKrneWalaKiId === jiskoFollowKarungaUskaId){
+            return res.status(401).json({
+                success: false,
+                message: "You can't follow or unfollow yourself"
+            })
+        }
+
+        const followKrneWalaUSer = await User.findById(followKrneWalaKiId);
+        const jiskoFollowKarungaWoUser = await User.findById(jiskoFollowKarungaUskaId);
+        if(!followKrneWalaUSer || !jiskoFollowKarungaWoUser){
+            return res.status(400).json({
+                success: false,
+                message: " Something went wrong while getting user !"
+            })
+        }
+
+        const isFollowing = followKrneWalaUSer.includes(jiskoFollowKarungaWoUser); // following: mtlb mai kisko-kisko follow kiya hu
+        if(isFollowing){
+            // hmare following me wo user present hai mtlb hm us user ko already follow kr chuka hu. Mtlb ab hme unfollow krna chahiye
+            await Promise.all([
+                User.updateOne( { _id: followKrneWalaKiId}, {$pull: {followings: jiskoFollowKarungaUskaId}}),
+                User.updateOne( { _id: jiskoFollowKarungaUskaId}, {$pull: {followings: followKrneWalaKiId}})
+            ])
+            return res.status(200).json({
+                success: true,
+                message: 'Unfollow successfully !'
+            })
+        } else {
+            // Agar following array me wo user nhi present hai to follow krunga
+            await Promise.all([
+                User.updateOne( { _id: followKrneWalaKiId}, {$push: {followings: jiskoFollowKarungaUskaId}}),
+                User.updateOne( { _id: jiskoFollowKarungaUskaId}, {$push: {followings: followKrneWalaKiId}})
+            ])
+            return res.status(200).json({
+                success: true,
+                message: 'followed successfully !'
+            })
+        }
+
+    } catch (error) {
+        console.error("fails to follow or unfollow!", error);
+    }
+}
+
 export const getfollowers = async (req, res) => {
     try {
         const { searchTerm } = req.body;
