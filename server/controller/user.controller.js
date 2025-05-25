@@ -186,7 +186,7 @@ export const followUnfollow = async (req, res) =>{
         const jiskoFollowKarungaUskaId = req.params.id;
 
         if(followKrneWalaKiId === jiskoFollowKarungaUskaId){
-            return res.status(401).json({
+            return res.status(400).json({
                 success: false,
                 message: "You can't follow or unfollow yourself"
             })
@@ -201,28 +201,27 @@ export const followUnfollow = async (req, res) =>{
             })
         }
 
-        const isFollowing = followKrneWalaUSer.includes(jiskoFollowKarungaWoUser); // following: mtlb mai kisko-kisko follow kiya hu
+        const isFollowing = followKrneWalaUSer.following.includes(jiskoFollowKarungaUskaId); // following: mtlb mai kisko-kisko follow kiya hu
         if(isFollowing){
             // hmare following me wo user present hai mtlb hm us user ko already follow kr chuka hu. Mtlb ab hme unfollow krna chahiye
             await Promise.all([
-                User.updateOne( { _id: followKrneWalaKiId}, {$pull: {followings: jiskoFollowKarungaUskaId}}),
-                User.updateOne( { _id: jiskoFollowKarungaUskaId}, {$pull: {followings: followKrneWalaKiId}})
+                User.updateOne( { _id: followKrneWalaKiId}, {$pull: {following: jiskoFollowKarungaUskaId}}),
+                User.updateOne( { _id: jiskoFollowKarungaUskaId}, {$pull: {followers: followKrneWalaKiId}})
             ])
-            return res.status(200).json({
-                success: true,
-                message: 'Unfollow successfully !'
-            })
         } else {
             // Agar following array me wo user nhi present hai to follow krunga
             await Promise.all([
-                User.updateOne( { _id: followKrneWalaKiId}, {$push: {followings: jiskoFollowKarungaUskaId}}),
-                User.updateOne( { _id: jiskoFollowKarungaUskaId}, {$push: {followings: followKrneWalaKiId}})
+                User.updateOne( { _id: followKrneWalaKiId}, {$push: {following: jiskoFollowKarungaUskaId}}),
+                User.updateOne( { _id: jiskoFollowKarungaUskaId}, {$push: {followers: followKrneWalaKiId}})
             ])
-            return res.status(200).json({
-                success: true,
-                message: 'followed successfully !'
-            })
         }
+
+        const updatedCurrentUser = await User.findById(followKrneWalaKiId);
+        return res.status(200).json({
+            success: true,
+            message: isFollowing ? 'Unfollowed successfully!' : 'Followed successfully!',
+            updatedUser: updatedCurrentUser
+        })
 
     } catch (error) {
         console.error("fails to follow or unfollow!", error);

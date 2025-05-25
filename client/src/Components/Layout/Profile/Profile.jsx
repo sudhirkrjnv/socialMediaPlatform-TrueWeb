@@ -1,19 +1,23 @@
 import {School, Home, LocationOn, Favorite, Instagram, WhatsApp, EventNote} from '@mui/icons-material';
 import coverPhoto from "./cover.jpg"
-import { useRef, useState } from 'react';
-import {useSelector} from 'react-redux';
+import { useEffect, useRef, useState } from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 import { Avatar } from '@mui/material';
 import Dialog from '../../../utils/dialogUtils.jsx';
 import EditProfile from './EditProfile.jsx';
 import moment from 'moment';
+import axios from 'axios';
+import { setAuthUser } from '../../../redux/authSlice.js'; 
 
 function Profile(){
 
     const profilePicRef = useRef();
     const [open, setOpen] = useState(false);
     const [image, setImage] = useState("");
-
+    const [isFollowing, setIsFollowing] = useState(false);
+    const dispatch = useDispatch();
     const {user} = useSelector(store=>store.auth);
+    console.log(user);
 
     const profilePicHandler = (e)=>{
         const file = e.target.files[0];
@@ -27,6 +31,30 @@ function Profile(){
             }
         }
     }
+
+    useEffect(() => {
+        if (user) {
+            setIsFollowing(user.followers?.includes(user._id) || false);
+        }
+    }, [user]);
+
+    const handleFollowUnfollow = async () => {
+        try {
+
+            const newFollowStatus = !isFollowing;
+            setIsFollowing(newFollowStatus);
+
+            const response = await axios.post(`http://localhost:8000/api/v1/user/followUnfollow/${user._id}`, {}, {withCredentials:true});
+            if (response.data.success) {
+                dispatch(setAuthUser(response.data.updatedUser));
+            } else {
+                    setIsFollowing(!newFollowStatus);
+            }
+        } catch (error) {
+            console.error("Error in follow/unfollow:", error);
+            setIsFollowing(prev => !prev);
+        }
+    };
 
     const about = [
         {
@@ -101,10 +129,15 @@ function Profile(){
                     <div style={{height:'50vh', width:'50vw'}}>
                             {/* Follow, unfollow, followers and Followings */}
                             <div style={{display:'flex', gap:'3vw'}}>
-                                <h5>username : {user?.username} <button style={{color:'white', backgroundColor:'green', fontFamily:'fantasy'}}>Follow</button></h5>
+                                <h5>
+                                    username : {user?.username} 
+                                    <button onClick={handleFollowUnfollow} style={{color:'white', backgroundColor:'green', fontFamily:'fantasy'}}>
+                                        {isFollowing ? 'Unfollow' : 'Follow'}
+                                    </button>
+                                </h5>
                                 <div style={{display:'flex', gap:'3vw', justifyContent:'center', alignItems:'center'}}>
-                                    <div><b>{user?.followers.length} Followers</b></div>
-                                    <div><b>{user?.following.length} Followings</b></div>
+                                    <div><b>{(user?.followers)?.length} Followers</b></div>
+                                    <div><b>{(user?.following)?.length} Followings</b></div>
                                 </div>
                             </div>
                             {/* Bio */}
